@@ -15,6 +15,7 @@ This is a play-by-play broadcaster's spot sheet for Alabama Women's Hockey. Util
 9. **Tonight's game is a fundraiser exhibition, not a counting game.** It lives in `TEAM.game`, never in `TEAM.seasons`, so a final score can never leak into season records, CHS history, head-to-head or aggregate numbers. No donation link, method or proceeds language was supplied; do not invent one.
 10. **The Bandits live in `OPPONENT`, never in `ROSTER`.** Names and line slots only, from the broadcaster's lines-app screenshots. No sweater numbers or stats were supplied, so `number:null` and nothing statistical is shown. "El Presidente" is Marc Hodges (Bandits president); Joey and Greg are first-name-only in the source. Their lines print on page 2 and appear at the bottom of Broadcast Mode.
 8. **Keep it plain HTML/CSS/JS with `<script src>` tags.** No bundler, no ES modules, no framework. It must open from `file://`.
+11. **Bump the `?v=N` on every css/js URL in `index.html` with each push.** GitHub Pages and browsers cache assets; without a new version tag a viewer can get a fresh `index.html` with stale scripts and see old data.
 
 ## Print-fit check (run after layout or notes changes)
 
