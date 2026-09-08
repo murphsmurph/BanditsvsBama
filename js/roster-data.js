@@ -510,17 +510,18 @@ const TEAM = {
    OPPONENT — HSV Bandits (men's beer-league team), tonight only.
    Source: Bandits lines-app screenshots supplied by the broadcaster.
    No sweater numbers and no stats were supplied, so none are shown.
-   Names as they appear in the app. "El Presidente" in the app is
-   Marc Hodges, Bandits team president (per broadcaster). Only first
-   names were available for Joey and Greg. Kept separate from ROSTER
-   so nothing about the Bandits can leak into Alabama views.
+   Names per the app and the broadcaster: "El Presidente" is Marc
+   Hodges, Bandits team president; "Greg" is Greg Mayer; "Joey" is
+   listed as Awesome Joey at the broadcaster's request. Player notes
+   show in Broadcast Mode only. Kept separate from ROSTER so nothing
+   about the Bandits can leak into Alabama views.
    ============================================================ */
 const OPPONENT = {
   name:"HSV Bandits", shortName:"Bandits", note:"men's beer-league team",
   source:"Bandits lines app screenshots supplied by broadcaster",
   roster:[
     {id:"harber",   firstName:"Nate",     lastName:"Harber",   position:"F", number:null, note:null},
-    {id:"joey",     firstName:"Joey",     lastName:null,       position:"F", number:null, note:"first name only in source"},
+    {id:"joey",     firstName:"Awesome Joey", lastName:null,   position:"F", number:null, note:null},
     {id:"pelle",    firstName:"Ren",      lastName:"Pelle",    position:"F", number:null, note:null},
     {id:"ratzlaff", firstName:"Carson",   lastName:"Ratzlaff", position:"F", number:null, note:null},
     {id:"presley",  firstName:"Taylor",   lastName:"Presley",  position:"F", number:null, note:null},
@@ -533,7 +534,7 @@ const OPPONENT = {
     {id:"barrueta", firstName:"Edgar",    lastName:"Barrueta", position:"D", number:null, note:null},
     {id:"hodges",   firstName:"Marc",     lastName:"Hodges",   position:"D", number:null, note:"Bandits team president"},
     {id:"kissel",   firstName:"Brian",    lastName:"Kissel",   position:"D", number:null, note:null},
-    {id:"greg",     firstName:"Greg",     lastName:null,       position:"D", number:null, note:"first name only in source"},
+    {id:"greg",     firstName:"Greg",     lastName:"Mayer",    position:"D", number:null, note:null},
     {id:"roy",      firstName:"Bradley",  lastName:"Roy",      position:"D", number:null, note:null},
     {id:"ashley",   firstName:"Jonathan", lastName:"Ashley",   position:"G", number:null, note:null}
   ],

@@ -174,8 +174,7 @@ function renderTeamSheet(){
   /* opponent lines — names only; no numbers or stats were supplied */
   const O = typeof OPPONENT !== "undefined" ? OPPONENT : null;
   const oppName = b => b.lastName ? `<b>${b.lastName.toUpperCase()}</b> ${b.firstName}` : `<b>${b.firstName.toUpperCase()}</b>`;
-  const oppLines = O ? linesGrid(O.lines, id => { const b = O.roster.find(x=>x.id===id); return b && oppName(b); }, {special:false, goalieRow:true, compact:true})
-    + `<div class="ts-legend">${O.roster.filter(b=>b.note).map(b=>`${(b.lastName||b.firstName).toUpperCase()} — ${b.note}`).join(" · ")} · Source: ${O.source}.</div>` : "";
+  const oppLines = O ? linesGrid(O.lines, id => { const b = O.roster.find(x=>x.id===id); return b && oppName(b); }, {special:false, goalieRow:true, compact:true}) : "";
 
   const pos = tally(r, p=>({F:"Forwards",D:"Defense",G:"Goalies"})[p.position]);
   const cls = tally(r, p=>({Fr:"Fr",So:"So",Jr:"Jr",Sr:"Sr",Gr:"Grad"})[p.classYear]);
