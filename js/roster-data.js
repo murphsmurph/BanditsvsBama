@@ -37,8 +37,9 @@ const ROSTER = [
   academics:{major:"News Media", careerGoal:null},
   alabamaStats:null,
   notes:[
-    {text:"10 years playing hockey", category:"hockey-history", priority:1},
-    {text:"News Media major", category:"academic", priority:1}
+    {text:"10 years of hockey · St. Louis Lady Cyclones 19U AA last season", category:"hockey-history", priority:1},
+    {text:"News Media major", category:"academic", priority:1},
+    {text:"One of two Missouri natives on the roster (with Kutz, Imperial)", category:"connection", priority:2}
   ]},
 
 { number:3, firstName:"Naomi", lastName:"Derksen", position:"D", role:"Defense", classYear:"Gr",
@@ -58,9 +59,10 @@ const ROSTER = [
     {field:"height", keep:"5'10\"", alternate:"5'11\"", alternateSource:"Elite Prospects", note:"Official height 5'10\"; Elite Prospects lists 5'11\". Using official.", print:false}
   ],
   notes:[
-    {text:"TEAM VP OPERATIONS · PhD candidate, condensed matter physics", category:"leadership", priority:1},
-    {text:"4th Alabama season · Physics + Applied Math, summa cum laude · ex-HS physics teacher", category:"academic", priority:2},
-    {text:"Lego devotee — Winnie the Pooh Treehouse", category:"fun-fact", priority:3}
+    {text:"TEAM VP OPERATIONS · PhD candidate in condensed matter physics · wants to be a college professor", category:"leadership", priority:1},
+    {text:"29-year-old grad student · moved from Saskatchewan to Tennessee at 13 · Nashville Flyers → Lipscomb (Physics + Applied Math, summa cum laude)", category:"hockey-history", priority:2},
+    {text:"Taught high-school math and physics in Tennessee for two years before Alabama", category:"bio", priority:2},
+    {text:"Lego devotee — Winnie the Pooh Treehouse · insists socks need a left and a right", category:"fun-fact", priority:3}
   ]},
 
 { number:4, firstName:"Samantha", lastName:"Lantz", position:"D", role:"Defense", classYear:"Jr",
@@ -73,7 +75,11 @@ const ROSTER = [
     {field:"position", keep:"D", alternate:"F", alternateSource:"Elite Prospects", note:"Official roster lists D; Elite Prospects lists F. Using official D.", print:true},
     {field:"height", keep:"5'9\"", alternate:null, alternateSource:"Elite Prospects", note:"Height 5'9\" comes from Elite Prospects; no official value on the team sheet.", print:false}
   ],
-  notes:[]},
+  notes:[
+    {text:"Defender who scores like a forward — 21 goals in a 15-game season · official roster says D, Elite Prospects lists F", category:"achievement", priority:1},
+    {text:"Turns 21 on Sep 14 — three days after this game", category:"fun-fact", priority:2},
+    {text:"No 2025–26 Alabama stat line in the EP snapshot", category:"data", priority:3}
+  ]},
 
 { number:5, firstName:"Anna", lastName:"Bobruff", position:"D", role:"Defense", classYear:"Sr",
   height:"5'4\"", weight:"141 lbs", hometown:"West Hartford, CT", shoots:"L", previousTeam:null, dob:"8/21/2001",
@@ -82,7 +88,11 @@ const ROSTER = [
     {season:"2024-25", league:"AAU (W)",  gp:15, g:0, a:4, p:4, pim:2},
     {season:"2025-26", league:"ACDC (W)", gp:11, g:0, a:1, p:1, pim:0}
   ]},
-  notes:[]},
+  notes:[
+    {text:"Born in Tuscaloosa (per Elite Prospects) · raised in West Hartford, CT", category:"connection", priority:1},
+    {text:"Senior D · one of three seniors with Scott and Kutz · 25 years old", category:"hockey-history", priority:2},
+    {text:"Two seasons, 26 games, only 2 PIM — a clean stay-at-home defender", category:"hockey-history", priority:2}
+  ]},
 
 { number:6, firstName:"Grace", lastName:"Cabeceiras", position:"F", role:"Winger", classYear:"So",
   height:"5'4\"", weight:null, hometown:"North Attleboro, MA", shoots:"R", previousTeam:"Bridgewater Bandits",
@@ -97,9 +107,9 @@ const ROSTER = [
     {field:"position", keep:"F", alternate:"D", alternateSource:"website roster page", note:"Team sheet and bio say forward/winger; the website roster page lists her as Defense. Using forward.", print:true}
   ],
   notes:[
-    {text:"Bridgewater Bandits · 11 years hockey", category:"hockey-history", priority:1},
-    {text:"Ballet trained — still dances en pointe", category:"fun-fact", priority:2},
-    {text:"PR + Advertising major", category:"academic", priority:2},
+    {text:"Bridgewater Bandits product · 11 years of hockey · faces a Bandits team tonight", category:"hockey-history", priority:1},
+    {text:"Ballet-trained — can still dance en pointe", category:"fun-fact", priority:2},
+    {text:"PR & Advertising major · high-school National Honor Society", category:"academic", priority:2},
     {text:"Hot take: Dunkin' over Starbucks", category:"hot-take", priority:3}
   ]},
 
@@ -109,8 +119,8 @@ const ROSTER = [
   academics:{major:"Psychology & General Business", careerGoal:null},
   alabamaStats:null,
   notes:[
-    {text:"FIRST YEAR PLAYING HOCKEY — newest to the game", category:"hockey-history", priority:1},
-    {text:"Psychology & General Business major", category:"academic", priority:1}
+    {text:"FIRST YEAR OF HOCKEY — picked up the game a year ago and is already on a college roster", category:"hockey-history", priority:1},
+    {text:"18 years old · Psychology & General Business major", category:"academic", priority:1}
   ]},
 
 { number:9, firstName:"Freya", lastName:"Seneski", position:"D", role:"Defense", classYear:"Jr",
@@ -122,14 +132,19 @@ const ROSTER = [
     {season:"2025-26", league:"ACDC (W)", gp:11, g:1, a:0, p:1, pim:6}
   ]},
   notes:[
-    {text:"Finance & Economics major", category:"academic", priority:1}
+    {text:"Finance & Economics major", category:"academic", priority:1},
+    {text:"Two-year regular on the blue line · first career goal came in 2025–26", category:"hockey-history", priority:2},
+    {text:"One of two Floridians (with Scott, Tampa) · 20 years old", category:"connection", priority:2}
   ]},
 
 { number:10, firstName:"Lylah", lastName:"Masiello", position:"F", role:"Center", classYear:"Fr",
   height:null, weight:null, hometown:"Littleton, CO", shoots:null, previousTeam:"Team Colorado 19U AAA", dob:"03/2008",
   yearsPlaying:null, sayLast:"mah-see-EL-oh", sayFirst:null, photo:null, academics:{major:null, careerGoal:null},
   alabamaStats:null,
-  notes:[]},
+  notes:[
+    {text:"Team Colorado 19U AAA — played at the US 19U Nationals last season", category:"hockey-history", priority:1},
+    {text:"Only Colorado native on the roster · born March 2008", category:"connection", priority:2}
+  ]},
 
 { number:11, firstName:"Emily", lastName:"Scott", position:"F", role:"Center", classYear:"Sr",
   height:"5'3\"", weight:"126 lbs", hometown:"Tampa, FL", shoots:"R", previousTeam:"Florida Alliance",
@@ -144,10 +159,11 @@ const ROSTER = [
     {season:"2025-26", league:"ACDC (W)", gp:12, g:5, a:4, p:9,  pim:6}
   ]},
   notes:[
-    {text:"Scored 2026 CHS playoff shootout winner vs USC", category:"achievement", priority:1},
-    {text:"TEAM VICE PRESIDENT · foundational player · 4th full season", category:"leadership", priority:2},
-    {text:"Once scored a between-the-legs breakaway goal", category:"fun-fact", priority:2},
-    {text:"Bucket list: score a Michigan", category:"personality", priority:3}
+    {text:"Scored the 2026 CHS playoff shootout winner vs USC", category:"achievement", priority:1},
+    {text:"TEAM VICE PRESIDENT · foundational player — here since the program's first season, now in her 4th", category:"leadership", priority:1},
+    {text:"Tampa native — the school Alabama beat 3–2 for the 2025 CHS title and lost to in the 2026 final", category:"connection", priority:2},
+    {text:"Once scored a between-the-legs breakaway goal in one of the program's first games", category:"fun-fact", priority:2},
+    {text:"Marketing major · 12 years of hockey · Florida Alliance 19U AA · bucket list: score a Michigan", category:"personality", priority:3}
   ]},
 
 { number:14, firstName:"Claire", lastName:"Carson", position:"F", role:"Center", classYear:"Jr",
@@ -162,10 +178,11 @@ const ROSTER = [
     {season:"2025-26", league:"ACDC (W)", gp:12, g:12, a:9,  p:21, pim:6}
   ]},
   notes:[
-    {text:"2024–25 CHS MVP · CHS All-Star", category:"achievement", priority:1},
-    {text:"TEAM PRESIDENT · 3rd Alabama season", category:"leadership", priority:2},
-    {text:"18 years hockey · Kinesiology → pediatric physical therapy", category:"career-goal", priority:2},
-    {text:"Hot take: loud chewing should be punishable", category:"hot-take", priority:3}
+    {text:"2024–25 CHS Women's Division MVP as a freshman · CHS All-Star", category:"achievement", priority:1},
+    {text:"TEAM PRESIDENT · 3rd Alabama season", category:"leadership", priority:1},
+    {text:"Toronto Aeros U18 AA → two seasons at Ridley College (OWHL U22 AA) before Alabama · 18 years of hockey", category:"hockey-history", priority:2},
+    {text:"Kinesiology → pediatric physical therapist · Kinesiology Club · UA Miracle Morale Team", category:"career-goal", priority:2},
+    {text:"Hot take: loud chewing should be a punishable offense", category:"hot-take", priority:3}
   ]},
 
 { number:15, firstName:"Avery", lastName:"LaRose", position:"F", role:"Winger", classYear:"Jr",
@@ -178,8 +195,10 @@ const ROSTER = [
     {season:"2025-26", league:"ACDC (W)", gp:11, g:2, a:1, p:3, pim:0}
   ]},
   notes:[
-    {text:"FAMILY TIE: uncle with Carolina during 2006 Stanley Cup season", category:"family", priority:1},
-    {text:"3rd Alabama season · Sport Management → NFL marketing", category:"career-goal", priority:2}
+    {text:"FAMILY TIE: uncle was with the Carolina Hurricanes during their 2006 Stanley Cup season", category:"family", priority:1},
+    {text:"Late starter — only 5 years of hockey, now in her 3rd Alabama season · first two career goals came in 2025–26", category:"hockey-history", priority:2},
+    {text:"Sport Management major → NFL marketing", category:"career-goal", priority:2},
+    {text:"One of three Marylanders (Henry, Salvato)", category:"connection", priority:3}
   ]},
 
 { number:18, firstName:"Caroline", lastName:"Craco", position:"F", role:"Forward", classYear:"So",
@@ -192,7 +211,8 @@ const ROSTER = [
     {field:"hometown", keep:"Fairfield, CT", alternate:null, alternateSource:"Elite Prospects", note:"Hometown taken from Elite Prospects place of birth (Fairfield, CT); the team sheet has no hometown for her.", print:false}
   ],
   notes:[
-    {text:"EP program record book: #2 all-time PIM", category:"achievement", priority:2}
+    {text:"Freshman year: nearly a point a game, with an edge — watch the penalty column", category:"achievement", priority:1},
+    {text:"Turned 19 in March", category:"fun-fact", priority:3}
   ]},
 
 { number:26, firstName:"Sofia", lastName:"Dy", position:"F", role:"Forward", classYear:"Fr",
@@ -200,7 +220,8 @@ const ROSTER = [
   yearsPlaying:8, sayLast:null, sayFirst:null, photo:null, academics:{major:null, careerGoal:null},
   alabamaStats:null,
   notes:[
-    {text:"8 years playing hockey", category:"hockey-history", priority:1}
+    {text:"8 years of hockey", category:"hockey-history", priority:1},
+    {text:"Only Georgia native on the roster — Alabama is 5–0 vs UGA in supplied results", category:"connection", priority:2}
   ]},
 
 { number:27, firstName:"Katie", lastName:"VanDyne", position:"F", role:"Winger", classYear:"So",
@@ -217,9 +238,10 @@ const ROSTER = [
     {field:"height", keep:"5'4\"", alternate:"5'3\"", alternateSource:"Elite Prospects", note:"Official height 5'4\"; Elite Prospects lists 5'3\". Using official.", print:false}
   ],
   notes:[
-    {text:"Playing since age 7 · Public Health → Physician Assistant", category:"career-goal", priority:1},
-    {text:"CHES Freshman Academic Achievement Award", category:"achievement", priority:2},
-    {text:"Big John Summit fan", category:"fun-fact", priority:3}
+    {text:"Playing since age 7", category:"hockey-history", priority:1},
+    {text:"Public Health → Physician Assistant · CHES Freshman Academic Achievement Award", category:"career-goal", priority:1},
+    {text:"Dean's List · Alpha Lambda Delta · Phi Sigma Theta", category:"achievement", priority:2},
+    {text:"Favorite artist: John Summit", category:"fun-fact", priority:3}
   ]},
 
 { number:28, firstName:"Kerrigan", lastName:"Henry", position:"F", role:"Center", classYear:"So",
@@ -232,10 +254,10 @@ const ROSTER = [
     {season:"2025-26", league:"ACDC (W)", gp:12, g:1, a:1, p:2, pim:2}
   ]},
   notes:[
-    {text:"PRESIDENT'S LIST — straight A+ semester", category:"achievement", priority:1},
-    {text:"Nursing major", category:"academic", priority:2},
-    {text:"Hidden talent: back handsprings", category:"fun-fact", priority:3},
-    {text:"Ella Langley fan", category:"fun-fact", priority:3}
+    {text:"PRESIDENT'S LIST — straight A+ semester · Nursing major", category:"achievement", priority:1},
+    {text:"6 years of hockey · AGHF 19U with the Montgomery Ice Devils before Alabama", category:"hockey-history", priority:2},
+    {text:"Phi Eta Sigma + Alpha Lambda Delta honor societies · Dean's List", category:"achievement", priority:2},
+    {text:"Hidden talent: back handsprings · Ella Langley fan", category:"fun-fact", priority:3}
   ]},
 
 { number:30, firstName:"Alex", lastName:"Hajjar", position:"G", role:"Goalie", classYear:"Fr",
@@ -244,8 +266,9 @@ const ROSTER = [
   academics:{major:"Kinesiology", careerGoal:null},
   alabamaStats:null,
   notes:[
-    {text:"Freshman goaltender · 12 years playing hockey", category:"hockey-history", priority:1},
-    {text:"Kinesiology major", category:"academic", priority:1}
+    {text:"Freshman goaltender · 12 years in the game", category:"hockey-history", priority:1},
+    {text:"Kinesiology major", category:"academic", priority:1},
+    {text:"Shares the crease with senior Natalie Kutz — verify tonight's starter", category:"hockey-history", priority:2}
   ]},
 
 { number:31, firstName:"Layla", lastName:"Salvato", position:"D", role:"Defense", classYear:"So",
@@ -254,7 +277,10 @@ const ROSTER = [
   alabamaStats:{source:EP, type:"skater", seasons:[
     {season:"2025-26", league:"ACDC (W)", gp:5, g:0, a:1, p:1, pim:0}
   ]},
-  notes:[]},
+  notes:[
+    {text:"5 games as a freshman · first collegiate point (an assist) in 2025–26", category:"hockey-history", priority:1},
+    {text:"Tri-City Eagles 19U Blue (AGHF) before Alabama · 19 years old", category:"hockey-history", priority:2}
+  ]},
 
 { number:41, firstName:"Anna", lastName:"Zahorchak", position:"F", role:"Center", classYear:"Jr",
   height:"5'8\"", weight:"172 lbs", hometown:"Pittsburgh, PA", shoots:"R", previousTeam:"Steel City Selects",
@@ -272,10 +298,10 @@ const ROSTER = [
     {field:"height", keep:"5'8\"", alternate:"5'7\"", alternateSource:"Elite Prospects", note:"Official height 5'8\"; Elite Prospects lists 5'7\". Using official.", print:false}
   ],
   notes:[
-    {text:"2025 CHS All-Star Challenge HARDEST SHOT", category:"achievement", priority:1},
-    {text:"EMT · National Merit Finalist · VP Finance & Fundraising", category:"leadership", priority:2},
-    {text:"Pre-Med Kinesiology + STEM-to-MBA → physician", category:"career-goal", priority:2},
-    {text:"Hot take: Skyline Chili over noodles", category:"hot-take", priority:3}
+    {text:"2025 CHS All-Star Challenge HARDEST SHOT winner", category:"achievement", priority:1},
+    {text:"Certified EMT · UA EMS · National Merit Finalist · VP of Finance & Fundraising", category:"leadership", priority:2},
+    {text:"Pre-Med Kinesiology + STEM-to-MBA → physician · Morgan's Message student-athlete ambassador", category:"career-goal", priority:2},
+    {text:"Steel City Selects 16U AA · 15 years of hockey · hot take: Skyline Chili over noodles", category:"hot-take", priority:3}
   ]},
 
 { number:46, firstName:"Hayden", lastName:"Bradley", position:"D", role:"Defense", classYear:"Fr",
@@ -288,10 +314,10 @@ const ROSTER = [
     {field:"hometown", keep:"Pelham, AL", alternate:"Hoover, AL", alternateSource:"site bio", note:"Team sheet says Pelham, AL; site bio says Hoover, AL. Using Pelham.", print:true}
   ],
   notes:[
-    {text:"IN-STATE FRESHMAN · Birmingham Jr. Bulls", category:"local-connection", priority:1},
+    {text:"IN-STATE FRESHMAN — from Pelham, home of the team's rink, via the Birmingham Jr. Bulls", category:"local-connection", priority:1},
     {text:"Nursing → nurse practitioner", category:"career-goal", priority:1},
-    {text:"7 years hockey", category:"hockey-history", priority:2},
-    {text:"Hot take: breakfast is the best meal", category:"hot-take", priority:3}
+    {text:"18 years old · 7 years of hockey", category:"hockey-history", priority:2},
+    {text:"Hot take: breakfast is the best meal of the day", category:"hot-take", priority:3}
   ]},
 
 { number:84, firstName:"Natalie", lastName:"Kutz", position:"G", role:"Goalie", classYear:"Sr",
@@ -306,8 +332,9 @@ const ROSTER = [
     {field:"height", keep:"5'2\"", alternate:null, alternateSource:"Elite Prospects", note:"Height 5'2\" comes from Elite Prospects; no official value on the team sheet.", print:false}
   ],
   notes:[
-    {text:"Senior goalie · prior college: Maryville Univ.", category:"hockey-history", priority:1},
-    {text:"8 years hockey · Nursing major", category:"academic", priority:2}
+    {text:"Goalie of record for 9 of the 15 games in the 2025 CHS championship season", category:"achievement", priority:1},
+    {text:"Transferred in from Maryville Univ. (ACHA D2) · Nursing major · 8 years of hockey", category:"hockey-history", priority:2},
+    {text:"23 years old · one of three seniors with Scott and Bobruff", category:"connection", priority:3}
   ]},
 
 { number:93, firstName:"Allie", lastName:"Roth", position:"D", role:"Defense", classYear:"Jr",
@@ -316,7 +343,10 @@ const ROSTER = [
   alabamaStats:{source:EP, type:"skater", seasons:[
     {season:"2025-26", league:"ACDC (W)", gp:10, g:7, a:5, p:12, pim:2}
   ]},
-  notes:[]}
+  notes:[
+    {text:"Transfer from Miami (Ohio) ACHA D2 · 7 goals in her first 10 Alabama games — from the blue line", category:"achievement", priority:1},
+    {text:"Nolensville, TN — Nashville-area native", category:"connection", priority:3}
+  ]}
 ];
 
 const TEAM = {
@@ -346,6 +376,7 @@ const TEAM = {
     opponent:"HSV Bandits",
     opponentNote:"men's beer-league team",
     date:"FRI SEP 11, 2026",
+    isoDate:"2026-09-11",
     time:"8:45 PM CT",
     home:true,
     counts:false,

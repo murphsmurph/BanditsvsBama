@@ -37,11 +37,11 @@ function measureOverflow(){
 /* start from the user's size, step down until it fits */
 function autoFit(){
   let s = FIT.user;
-  setScale(s); fitAllNames();
+  setScale(s); fitAllNames(); fitNotes();
   let over = measureOverflow();
   while(over > 0.5 && s > FIT.min){
     s = +(s - 0.02).toFixed(2);
-    setScale(s); fitAllNames();
+    setScale(s); fitAllNames(); fitNotes();
     over = measureOverflow();
   }
   reportFit(over, s);

@@ -24,9 +24,7 @@ function renderBcast(filter=""){
         </div>
       </div>
       <ul class="bnotes" id="bn${p.number}">
-        ${generatedStatNote(p) ? `<li class="gen">${generatedStatNote(p)}</li>` : ""}
-        ${[...p.notes].sort((a,b)=>a.priority-b.priority).map(n=>`<li>${n.text}</li>`).join("")}
-        ${recordBookLine(p) ? `<li class="rb">${recordBookLine(p)}</li>` : ""}
+        ${noteCandidates(p).map(n=>`<li${n.gen?(n.category==='record'?' class="rb"':' class="gen"'):''}>${n.text}</li>`).join("")}
         ${dqList(p).filter(d=>d.print).map(d=>`<li class="dq">VERIFY · ${d.note}</li>`).join("")}
       </ul>
     </div>`).join("");

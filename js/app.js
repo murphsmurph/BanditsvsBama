@@ -80,6 +80,35 @@ function formatAlabamaStatLine(p){
 }
 const generatedStatNote = formatAlabamaStatLine;
 
+/* season-by-season split for players with 2+ Alabama seasons (the career line already covers one-season players) */
+function seasonSplitNote(p){
+  const S = p.alabamaStats; if(!S || !S.seasons || S.seasons.length < 2) return null;
+  const yr = s => s.season.replace("-","–");
+  if(S.type==='goalie')
+    return S.seasons.map(s=>`${yr(s)}: ${s.w}–${s.l}–${s.t} · ${s.gaa!=null?s.gaa.toFixed(2)+" GAA":""}${s.svPct!=null?" · "+s.svPct.toFixed(3).replace(/^0/,"")+" SV%":""} · ${s.so} SO`).join("  |  ");
+  return S.seasons.map(s=>`${yr(s)}: ${s.g}G–${s.a}A–${s.p}P in ${s.gp} GP`).join("  |  ");
+}
+
+/* every bullet a view may show, best first: generated stat line → priority-1 hooks →
+   generated season split → generated record-book ranks → priority 2 → priority 3 */
+function noteCandidates(p){
+  const gen = [];
+  const stat = generatedStatNote(p); if(stat) gen.push({text:stat, category:"stats", priority:0, gen:true});
+  const split = seasonSplitNote(p);  if(split) gen.push({text:split, category:"stats", priority:1.5, gen:true});
+  const rb = recordBookLine(p);      if(rb) gen.push({text:rb, category:"record", priority:1.6, gen:true});
+  return [...gen, ...p.notes].sort((a,b)=>a.priority-b.priority);
+}
+
+/* age on game day from a full M/D/YYYY date of birth; null for partial or missing dates */
+function ageOn(dob, iso){
+  if(!dob || !iso) return null;
+  const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(dob); if(!m) return null;
+  const g = new Date(iso+"T12:00:00"), b = new Date(+m[3], +m[1]-1, +m[2]);
+  let a = g.getFullYear() - b.getFullYear();
+  if(g.getMonth() < b.getMonth() || (g.getMonth()===b.getMonth() && g.getDate() < b.getDate())) a--;
+  return a;
+}
+
 /* data-quality entries, normalised to the array form */
 const dqList = p => !p.dataQuality ? [] : Array.isArray(p.dataQuality) ? p.dataQuality : [{field:null, note:p.dataQuality.note, print:true}];
 

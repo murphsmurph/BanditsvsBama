@@ -84,7 +84,8 @@ function statsTable(p){
 function openStudy(num){
   const p = ROSTER.find(x=>x.number===num);
   pState(num).seen = true; saveProgress();
-  const hooks = [...p.notes].sort((a,b)=>a.priority-b.priority).slice(0,5).map(n=>n.text);
+  const hooks = noteCandidates(p).filter(n=>!n.gen).map(n=>n.text);
+  const age = ageOn(p.dob, TEAM.game && TEAM.game.isoDate);
   const statLine = generatedStatNote(p);
   const rbLine = recordBookLine(p);
   const dq = dqList(p);
@@ -105,7 +106,7 @@ function openStudy(num){
       <b>Weight</b><span>${p.weight||"—"}</span>
       <b>${isG?"Catches":"Shoots"}</b><span>${(isG?p.catches:p.shoots)||"—"}</span>
       <b>Hometown</b><span>${p.hometown||"—"}</span>
-      <b>Born</b><span>${p.dob||"—"}</span>
+      <b>Born</b><span>${p.dob||"—"}${age!=null?` (${age} on game day)`:""}</span>
       <b>Say it</b><span>${sayLine(p)||"as spelled"}</span>
     </div>`)}
     ${sec("Hockey", `<div class="kv">

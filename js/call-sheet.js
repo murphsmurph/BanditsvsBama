@@ -4,25 +4,24 @@
    the final text scale after this runs.
    ============================================================ */
 
-/* generated Alabama stat line first (priority 0), then narrative notes;
-   priority 3 lives in Learn the Roster. Players with no Alabama games get no stat line. */
-function pickNotes(p, max){
-  const generated = generatedStatNote(p);
-  const narrative = [...p.notes]
-    .sort((a,b)=>a.priority-b.priority)
-    .filter(n=>n.priority<=2);
-  const merged = generated ? [{text:generated, category:"stats", priority:0}, ...narrative] : narrative;
-  return merged.slice(0,max);
+/* every candidate bullet is rendered; fitNotes() then hides trailing ones per row until the
+   row fits at the current text size. The first MANDATORY bullets always stay (the generated
+   stat line + best hook), so print-fit shrinks text only when even those overflow. */
+const MANDATORY_NOTES = 2;
+function pickNotes(p){ return noteCandidates(p); }
+
+function fitNotes(){
+  $$('#csRows .player-row').forEach(row=>{
+    const cell = row.querySelector('.notes-cell');
+    const lis = [...cell.querySelectorAll('li')];
+    lis.forEach(li=> li.hidden = false);
+    for(let i = lis.length-1; i >= MANDATORY_NOTES && cell.scrollHeight > cell.clientHeight + 0.5; i--) lis[i].hidden = true;
+  });
 }
 
 function renderCallSheet(){
   const roster = activeRoster();
   const rows = $('#csRows');
-
-  /* how many bullets a row can hold depends on how tall each row will be */
-  const rowsArea = 1021 - 35 - 16 - 15;             // page − header − colhead − footer (px @96dpi)
-  const rowH = rowsArea / roster.length;
-  const maxNotes = rowH >= 42 ? 3 : 2;
 
   rows.innerHTML = roster.map(p=>{
     /* first-name phonetic sits beside the first name; surname phonetic leads the subline under the surname */
@@ -33,7 +32,7 @@ function renderCallSheet(){
       .filter(Boolean).join(" &nbsp;·&nbsp; ");
     const sub = [p.sayLast ? `<span class="say">${p.sayLast}</span>` : null, p.hometown, p.previousTeam]
       .filter(Boolean).join(" · ");
-    const notes = pickNotes(p, maxNotes).map(n=>`<li>${n.text}</li>`).join("");
+    const notes = pickNotes(p).map(n=>`<li${n.gen?' class="gen"':''}>${n.text}</li>`).join("");
     return `<div class="player-row">
       <div class="id-cell">
         <div class="num-block${p.position==='G'?' goalie':''}">${p.number}</div>
@@ -141,7 +140,6 @@ function renderTeamSheet(){
   const byNumbers = ul(numbers) + (TEAM.careerLegend ? `<div class="ts-legend">${TEAM.careerLegend}</div>` : "");
   const leaders = r.filter(p=>p.leadership && p.leadership.length)
     .map(p=>`${tag(p)} — ${p.leadership.join(" · ")}`);
-  const sayList = r.filter(p=>p.sayLast||p.sayFirst).map(p=>`<b>${p.number}</b> ${sayLine(p)}`);
 
   /* ---- right column ---- */
   const L = TEAM.lines || {};
@@ -190,7 +188,6 @@ function renderTeamSheet(){
     <div class="ts-col">
       ${sec(TEAM.lines ? "LINES" : "LINES — fill in at the rink", lines)}
       ${sec("GOALIES", goalieRows)}
-      ${sec("SAY IT RIGHT", ul(sayList))}
       ${sec("ROSTER BREAKDOWN", breakdown)}
       ${sec("GAME-DAY VERIFY", ul(verify))}
       ${fill("SCORING · PENALTIES")}

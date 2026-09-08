@@ -38,8 +38,8 @@
   display:flex;flex:0 0 auto;height:.16in;
   background:var(--black);color:#fff;font-size:7.5px;letter-spacing:1px;font-weight:700;
 }
-.cs-colhead .a{width:42%;padding:0 6px;display:flex;align-items:center;}
-.cs-colhead .b{width:58%;padding:0 6px;display:flex;align-items:center;}
+.cs-colhead .a{width:40%;padding:0 6px;display:flex;align-items:center;}
+.cs-colhead .b{width:60%;padding:0 6px;display:flex;align-items:center;}
 .cs-foot{
   flex:0 0 auto;height:.15in;
   border-top:1.5px solid var(--bama-crimson);
@@ -61,7 +61,7 @@
 
 /* ---- left: identification ---- */
 .id-cell{
-  width:42%;display:flex;align-items:center;gap:5px;
+  width:40%;display:flex;align-items:center;gap:5px;
   padding:1px 4px 1px 0;
   border-right:2px solid var(--bama-crimson);
   overflow:hidden;
@@ -89,16 +89,19 @@
 
 /* ---- right: broadcast notes ---- */
 .notes-cell{
-  width:58%;padding:2px 5px;display:flex;flex-direction:column;justify-content:center;
+  width:60%;padding:2px 5px;display:flex;flex-direction:column;justify-content:center;
   overflow:hidden;
 }
 .notes-cell ul{margin:0;padding:0;list-style:none;}
 .notes-cell li{
   font-size:calc(7.6px * var(--scale));line-height:1.22;
   padding-left:6px;position:relative;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  white-space:normal;overflow-wrap:anywhere;   /* bullets wrap; fitNotes() hides the ones that don't fit */
 }
+.notes-cell li[hidden]{display:none;}
 .notes-cell li:before{content:"•";position:absolute;left:0;color:var(--bama-crimson);}
+.notes-cell li.gen{font-weight:700;}
+.notes-cell li.gen + li.gen{font-weight:400;}   /* only the career line is bold; split/record lines stay regular */
 
 /* ============================================================
    TEAM SHEET — page 2. Fixed sizes (no --scale): the content is
