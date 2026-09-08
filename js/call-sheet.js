@@ -93,7 +93,7 @@ function renderTeamSheet(){
     ["Home rink", TEAM.homeRink],
     ["Practice", TEAM.practice]
   ]);
-  const staff = kv(TEAM.staff.map(s=>[s.role, `${s.name} <i>· ${s.from}${s.note?" · "+s.note:""}</i>`]));
+  const staff = kv(TEAM.staff.map(s=>[s.role, `${s.name} <i>· ${s.from}</i>`]));   /* staff notes live in Storylines + Learn the Roster */
   const history = ul(TEAM.history);
 
   /* TONIGHT'S GAME — fundraiser exhibition; stored in TEAM.game, never in seasons */
@@ -185,14 +185,72 @@ function renderTeamSheet(){
   const goalies = r.filter(p=>p.position==='G');
   const goalieRows = ul(goalies.map(p=>{
     const t = lineTags(p).filter(x=>/START|BACKUP|SCRATCHED|NOT ON/.test(x));
-    return `${tag(p)}${t.length?` <span class="ln">${t.join(" · ")}</span>`:""} · ${p.classYear}${p.yearsPlaying?` · ${p.yearsPlaying} yrs hockey`:""}${p.hometown?` · ${p.hometown}`:""}`;
+    const stat = generatedStatNote(p);
+    return `${tag(p)}${t.length?` <span class="ln">${t.join(" · ")}</span>`:""} · ${p.classYear}${p.yearsPlaying?` · ${p.yearsPlaying} yrs hockey`:""}${p.hometown?` · ${p.hometown}`:""}${stat?` · <b>${stat}</b>`:""}`;
   }));
+
+  /* ---- AUDIT EXTRAS — every line below is computed from ROSTER / TEAM, nothing typed ---- */
+  const dressed = dressedRoster();
+  const iso = TEAM.game && TEAM.game.isoDate;
+  const skT = p => getAlabamaSkaterTotals(p) || {p:0, g:0, pim:0, gp:0};
+  const unitPlayers = keys => (keys||[]).filter(k=>k!=null).map(byNum).filter(Boolean);
+  const unitSum = (keys, f) => unitPlayers(keys).reduce((a,p)=>a+f(skT(p)),0);
+  const unitLbl = keys => unitPlayers(keys).map(p=>`${p.lastName} ${skT(p).p}`).join(" · ");
+  const totG = dressed.reduce((a,p)=>a+skT(p).g,0), totP = dressed.reduce((a,p)=>a+skT(p).p,0);
+  const prodRows = L ? [
+    ...(L.forwards||[]).map((row,i)=>["F"+(i+1), row]),
+    ...(L.defense||[]).map((row,i)=>["D"+(i+1), row]),
+    ...(L.pp||[]).map((u,i)=>["PP"+(i+1), u])
+  ].filter(([,keys])=>unitPlayers(keys).length) : [];
+  const production = !prodRows.length ? "" : kv(prodRows.map(([lbl,keys])=>{
+    const P = unitSum(keys,t=>t.p), G = unitSum(keys,t=>t.g);
+    return [lbl, `<b>${P} P · ${G} G</b>${/^[FD]/.test(lbl) ? ` · ${unitLbl(keys)}` : totP ? ` · ${Math.round(100*P/totP)}% of dressed career points` : ""}`];
+  })) + (L && L.forwards && totG ? `<div class="ts-legend">Dressed skaters' Alabama career totals: ${totG} G · ${totP} P · F1 has ${Math.round(100*unitSum(L.forwards[0],t=>t.g)/totG)}% of the goals.</div>` : "");
+
+  /* storylines */
+  const hc = TEAM.staff.find(s=>/head coach/i.test(s.role));
+  const lastSeason = TEAM.seasons[TEAM.seasons.length-1];
+  const lastGame = lastSeason && [...lastSeason.games].reverse().find(g=>g.counts && g.result);
+  const carson = r.find(p=>fullName(p)===(lead&&lead.name));
+  const cT = carson && skT(carson);
+  const unbeaten = h2h.filter(h=>h.l===0 && h.gp>=3);
+  const debuts = dressed.filter(p=>!p.alabamaStats);
+  const bdays = dressed.map(p=>({p, d:daysToBirthday(p.dob, iso), age:ageOn(p.dob, iso)})).filter(x=>x.d!=null && x.d<=14).sort((a,b)=>a.d-b.d);
+  const storylines = [
+    [hc && hc.note ? `${hc.name}'s ${hc.note.replace(/^first year as/,"first season as")}` : null,
+     /W2/.test(TEAM.league) ? `Alabama's first season in ACHA W2 after moving up from ACDC` : null].filter(Boolean).join(" · ") || null,
+    lastGame ? `Last competitive game: ${lastGame.note||"regular season"} · ${lastGame.result} ${lastGame.gf}–${lastGame.ga} ${lastGame.opp} (${dash(lastSeason.season)}) — first look at the team since` : null,
+    cT ? `${carson.lastName} enters the season ${50-cT.g>0?`${50-cT.g} G from 50`:""}${100-cT.p>0?` and ${100-cT.p} P from 100`:""} for her Alabama career (counting games only — tonight is an exhibition)` : null,
+    unbeaten.length ? `Unbeaten vs ${unbeaten.map(h=>short(h.opp)).join(" and ")} in supplied results: ${unbeaten.reduce((a,h)=>a+h.w,0)}–0, outscoring them ${unbeaten.reduce((a,h)=>a+h.gf,0)}–${unbeaten.reduce((a,h)=>a+h.ga,0)}` : null,
+    debuts.length ? `${debuts.length} of ${dressed.length} dressed have never played an Alabama game: ${debuts.map(p=>`${p.number} ${p.lastName}${p.position==='G'?" (in goal)":""}`).join(" · ")}` : null,
+    bdays.length ? `Birthday watch: ${bdays.map(x=>`${x.p.lastName} turns ${x.age+1} ${x.d===0?"today":x.d===1?"tomorrow":`in ${x.d} days`}`).join(" · ")}${bdays.length>1 && new Set(bdays.map(x=>x.d)).size===1 ? " — same day" : ""}` : null
+  ].filter(Boolean);
+
+  /* roster notes: ages, heights, health-care track, PIM */
+  const aged = dressed.map(p=>({p, a: ageOn(p.dob, iso) ?? p.age ?? null})).filter(x=>x.a!=null);
+  const maxA = Math.max(...aged.map(x=>x.a)), minA = Math.min(...aged.map(x=>x.a));
+  const avgA = aged.length ? (aged.reduce((a,x)=>a+x.a,0)/aged.length).toFixed(1) : null;
+  const hts = dressed.map(p=>({p, h:heightIn(p.height)})).filter(x=>x.h);
+  const maxH = hts.length && hts.reduce((a,x)=>x.h>a.h?x:a), minH = hts.length && hts.reduce((a,x)=>x.h<a.h?x:a);
+  const avgH = hts.length ? hts.reduce((a,x)=>a+x.h,0)/hts.length : null;
+  const care = dressed.filter(p=>/nurs|physician|therap|pre-med|medic/i.test(`${p.academics&&p.academics.major||""} ${p.academics&&p.academics.careerGoal||""}`));
+  const careLbl = p => { const g = p.academics.careerGoal, m = p.academics.major; return (g ? g : m).replace("Pediatric physical therapist","pediatric PT").replace("Physician Assistant","PA").replace("Nurse practitioner","NP").replace("Nursing","nursing").replace("Physician","physician"); };
+  const pimTop = dressed.filter(p=>skT(p).pim>0).sort((a,b)=>skT(b).pim-skT(a).pim).slice(0,5);
+  const rosterNotes = [
+    aged.length ? `Ages: oldest ${aged.filter(x=>x.a===maxA).map(x=>`${x.p.lastName} ${maxA}`).join(", ")} · youngest ${minA} (${aged.filter(x=>x.a===minA).map(x=>x.p.lastName).join(", ")}) · avg ${avgA}` : null,
+    hts.length ? `Heights: ${maxH.p.lastName} ${maxH.p.height} tallest · ${minH.p.lastName} ${minH.p.height} shortest · avg ${inToHeight(avgH)}` : null,
+    care.length ? `Health-care bound (${care.length} of ${dressed.length}): ${care.map(p=>`${p.lastName} ${careLbl(p)}`).join(" · ")}` : null
+  ].filter(Boolean);
+  const pimLine = pimTop.length ? `<div class="ts-legend">Career PIM: ${pimTop.map(p=>`${p.lastName} ${skT(p).pim}`).join(" · ")}</div>` : "";
+  /* dressed breakdown for tonight */
+  const dPos = tally(dressed, p=>({F:"F",D:"D",G:"G"})[p.position]);
 
   const pos = tally(r, p=>({F:"Forwards",D:"Defense",G:"Goalies"})[p.position]);
   const cls = tally(r, p=>({Fr:"Fr",So:"So",Jr:"Jr",Sr:"Sr",Gr:"Grad"})[p.classYear]);
   const states = tally(r, p=> p.hometown ? p.hometown.split(",").pop().trim() : null);
   const breakdown = kv([
-    ["Skaters", `${r.length} players · ${tallyStr(pos)}`],
+    ["Tonight", `${dressed.length} dressed · ${tallyStr(dPos)}${r.length!==dressed.length?` · ${r.length-dressed.length} not on the coach's sheet`:""}`],
+    ["Roster", `${r.length} players · ${tallyStr(pos)}`],
     ["Classes", tallyStr(cls)],
     ["Home states", tallyStr(states) + (r.some(p=>!p.hometown) ? ` · ${r.filter(p=>!p.hometown).length} not listed` : "")]
   ]);
@@ -205,12 +263,15 @@ function renderTeamSheet(){
       ${sec("HISTORY", history)}
       ${sec("BY THE NUMBERS", byNumbers)}
       ${sec("LEADERSHIP", ul(leaders))}
+      ${rosterNotes.length ? sec("ROSTER NOTES", ul(rosterNotes)) : ""}
       ${fill("GAME NOTES")}
     </div>
     <div class="ts-col">
       ${sec(L ? `LINES — ${L.source}` : "LINES — fill in at the rink", lines)}
       ${special ? sec("POWER PLAY · PENALTY KILL", special) : ""}
       ${sec("GOALIES", goalieRows)}
+      ${storylines.length ? sec("STORYLINES", ul(storylines)) : ""}
+      ${production ? sec("LINE PRODUCTION — Alabama career P · G by unit", production + pimLine) : ""}
       ${sec("ROSTER BREAKDOWN", breakdown)}
       ${fill("GAME NOTES · SCORING · PENALTIES")}
     </div>`;

@@ -355,10 +355,9 @@ const TEAM = {
   homeRink:"Pelham Civic Complex",
   practice:"Wednesday nights in Birmingham, about an hour from campus",
   history:[
-    "Reached the CHS championship game in each of the program's first two seasons",
+    "CHS championship game in each of the program's first two seasons",
     "2024–25 CHS CHAMPION · advanced to the AAU National Championship",
-    "2025–26 CHS RUNNER-UP / FINALIST",
-    "Moved from ACDC to ACHA W2 for 2026–27"
+    "2025–26 CHS RUNNER-UP / FINALIST · moved up to ACHA W2 for 2026–27"
   ],
   staff:[
     {role:"Head Coach", name:"Jeffery Edmiston", from:"Huntsville, AL", note:"first year as head coach", bio:null},
@@ -409,7 +408,7 @@ const TEAM = {
   },
 
   /* Alabama-only career legend, printed on page 2 */
-  careerLegend:"PLAYER CAREER LINE = Alabama AAU (2024–25) + ACDC (2025–26) only.",
+  careerLegend:"Career lines = Alabama AAU 2024–25 + ACDC 2025–26 only.",
 
   /* Program record book — Elite Prospects snapshot. Never inferred from
      the active roster. gamesPlayed: EP enumerated 1/2/3 despite equal

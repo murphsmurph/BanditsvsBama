@@ -122,12 +122,25 @@ const dressedRoster = () => activeRoster().filter(p=>!offLineup(p));
 /* age on game day from a full M/D/YYYY date of birth; null for partial or missing dates */
 function ageOn(dob, iso){
   if(!dob || !iso) return null;
-  const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(dob); if(!m) return null;
-  const g = new Date(iso+"T12:00:00"), b = new Date(+m[3], +m[1]-1, +m[2]);
+  const full = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(dob);
+  const my = /^(\d{1,2})\/(\d{4})$/.exec(dob);          /* month/year only (e.g. "03/2008") — exact enough for an age */
+  if(!full && !my) return null;
+  const g = new Date(iso+"T12:00:00");
+  const b = full ? new Date(+full[3], +full[1]-1, +full[2]) : new Date(+my[2], +my[1]-1, 1);
   let a = g.getFullYear() - b.getFullYear();
-  if(g.getMonth() < b.getMonth() || (g.getMonth()===b.getMonth() && g.getDate() < b.getDate())) a--;
+  if(g.getMonth() < b.getMonth() || (full && g.getMonth()===b.getMonth() && g.getDate() < b.getDate())) a--;
   return a;
 }
+/* days from game day to the player's next birthday (full DOB only); null if unknown */
+function daysToBirthday(dob, iso){
+  const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(dob||""); if(!m || !iso) return null;
+  const g = new Date(iso+"T12:00:00");
+  let b = new Date(g.getFullYear(), +m[1]-1, +m[2], 12);
+  if(b < g) b = new Date(g.getFullYear()+1, +m[1]-1, +m[2], 12);
+  return Math.round((b - g) / 86400000);
+}
+const heightIn = h => { const m = /^(\d)'(\d{1,2})"?$/.exec(h||""); return m ? +m[1]*12 + +m[2] : null; };
+const inToHeight = n => `${Math.floor(n/12)}'${Math.round(n%12)}"`;
 
 /* data-quality entries, normalised to the array form */
 const dqList = p => !p.dataQuality ? [] : Array.isArray(p.dataQuality) ? p.dataQuality : [{field:null, note:p.dataQuality.note, print:true}];

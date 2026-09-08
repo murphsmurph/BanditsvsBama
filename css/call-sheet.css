@@ -120,7 +120,7 @@
 }
 .ts-col{min-height:0;min-width:0;overflow:hidden;display:flex;flex-direction:column;}
 .ts-col:first-child{border-right:2px solid var(--bama-crimson);padding-right:10px;}
-.ts-sec{margin-bottom:6px;flex:0 0 auto;}
+.ts-sec{margin-bottom:5px;flex:0 0 auto;}
 .ts-sec h3{
   font-size:8.5px;letter-spacing:1.2px;margin:0 0 4px;
   color:#fff;background:var(--black);display:inline-block;padding:2px 6px;
@@ -136,7 +136,7 @@
 
 /* ruled write-in blocks: they absorb whatever height is left, so page 2 cannot overflow */
 .ts-sec.fill{
-  flex:1 1 auto;min-height:.6in;margin-bottom:0;
+  flex:1 1 auto;min-height:.5in;margin-bottom:0;
   display:flex;flex-direction:column;
 }
 .ts-sec.fill h3{align-self:flex-start;}
