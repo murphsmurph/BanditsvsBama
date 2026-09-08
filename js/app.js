@@ -115,6 +115,10 @@ function lineTags(p){
   return t;
 }
 
+/* not dressed tonight: scratched, or absent from the coach's sheet. Page 1 skips them; every other view keeps them. */
+const offLineup = p => { const L = TEAM.lines; return !!L && ((L.scratched||[]).includes(p.number) || (L.notListed||[]).includes(p.number)); };
+const dressedRoster = () => activeRoster().filter(p=>!offLineup(p));
+
 /* age on game day from a full M/D/YYYY date of birth; null for partial or missing dates */
 function ageOn(dob, iso){
   if(!dob || !iso) return null;

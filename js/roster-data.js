@@ -267,8 +267,7 @@ const ROSTER = [
   alabamaStats:null,
   notes:[
     {text:"Freshman goaltender · 12 years in the game", category:"hockey-history", priority:1},
-    {text:"Kinesiology major", category:"academic", priority:1},
-    {text:"Shares the crease with senior Natalie Kutz — verify tonight's starter", category:"hockey-history", priority:2}
+    {text:"Kinesiology major", category:"academic", priority:1}
   ]},
 
 { number:31, firstName:"Layla", lastName:"Salvato", position:"D", role:"Defense", classYear:"So",

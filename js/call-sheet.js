@@ -20,7 +20,8 @@ function fitNotes(){
 }
 
 function renderCallSheet(){
-  const roster = activeRoster();
+  const roster = dressedRoster();
+  const out = activeRoster().filter(offLineup);
   const rows = $('#csRows');
 
   rows.innerHTML = roster.map(p=>{
@@ -48,8 +49,9 @@ function renderCallSheet(){
     </div>`;
   }).join("");
 
-  $('#footCount').textContent = roster.length + " PLAYERS";
-  $('#rosterCount').textContent = roster.length + " players on the sheet.";
+  const outTxt = out.length ? ` · NOT ON LINEUP: ${out.map(p=>p.number+" "+p.lastName.toUpperCase()).join(" · ")}` : "";
+  $('#footCount').textContent = roster.length + " DRESSED" + outTxt;
+  $('#rosterCount').textContent = `${roster.length} players on the sheet${out.length?` (${out.length} not on the coach's lineup are left off page 1 but stay in every other view)`:""}.`;
 }
 
 /* per-surname shrink so ZAHORCHAK / CABECEIRAS never wrap or clip.

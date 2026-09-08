@@ -6,7 +6,7 @@ Broadcast prep and live-call tool for Alabama Women's Hockey. Open `index.html` 
 
 | Tab | Job |
 |---|---|
-| **Call Sheet** | Two Letter-portrait pages. Page 1: 21 players by sweater number, ID on the left, broadcast bullets on the right. Page 2: team sheet — program facts, staff, history, leadership, phonetics list, lines grid, goalies, roster breakdown, game-day verify, ruled space for notes and scoring. Print this. |
+| **Call Sheet** | Two Letter-portrait pages. Page 1: the dressed players (18 tonight) by sweater number, ID on the left, broadcast bullets on the right. Page 2: team sheet — program facts, staff, history, leadership, phonetics list, lines grid, goalies, roster breakdown, game-day verify, ruled space for notes and scoring. Print this. |
 | **Learn the Roster** | Player grid, filters, full study panel, mastery bar. |
 | **Flashcards** | Number → name drills. `Space` reveals, `←`/`→` moves. |
 | **Quizzes** | Number → name, name → number. Photo ID unlocks once headshots exist. |
