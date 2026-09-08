@@ -142,23 +142,38 @@ function renderTeamSheet(){
     .map(p=>`${tag(p)} — ${p.leadership.join(" · ")}`);
 
   /* ---- right column ---- */
-  const L = TEAM.lines || {};
-  const byNum = n => r.find(p=>p.number===n);
-  const slot = (n, cls="") => { const p = n && byNum(n); return `<div class="slot ${cls}">${p ? tag(p) : "&nbsp;"}</div>`; };
+  /* one lines-grid renderer for both teams: `resolve(key)` turns a line-chart key into a name, or
+     falsy for an empty slot. Alabama keys are sweater numbers; Bandits keys are OPPONENT ids. */
   const lineRow = (lbl, cells) => `<div class="line"><div class="lbl">${lbl}</div>${cells}</div>`;
   const hdr = cols => `<div class="line hdr"><div class="lbl"></div>${cols.map(c=>`<div class="slot">${c}</div>`).join("")}</div>`;
-  const lines = `<div class="lines">
-    ${hdr(["LW","C","RW"])}
-    ${[0,1,2,3].map(i=> lineRow("F"+(i+1), [0,1,2].map(j=> slot(L.forwards && L.forwards[i] && L.forwards[i][j])).join(""))).join("")}
-    ${hdr(["LD","RD",""])}
-    ${[0,1,2].map(i=> lineRow("D"+(i+1), [0,1].map(j=> slot(L.defense && L.defense[i] && L.defense[i][j])).join("") + `<div class="slot blank"></div>`)).join("")}
-    ${["PP1","PP2","PK1","PK2"].map(l=> lineRow(l, `<div class="slot wide">&nbsp;</div>`)).join("")}
-  </div>`;
+  const at = (L, group, i, j) => L && L[group] && L[group][i] ? L[group][i][j] : null;
+  const linesGrid = (L, resolve, {special=true, goalieRow=false, compact=false}={}) => {
+    const slot = (key, cls="") => `<div class="slot ${cls}">${(key!=null && resolve(key)) || "&nbsp;"}</div>`;
+    return `<div class="lines${compact?" sm":""}">
+      ${hdr(["LW","C","RW"])}
+      ${[0,1,2,3].map(i=> lineRow("F"+(i+1), [0,1,2].map(j=> slot(at(L,'forwards',i,j))).join(""))).join("")}
+      ${hdr(["LD","RD",goalieRow?"G":""])}
+      ${[0,1,2].map(i=> lineRow("D"+(i+1), [0,1].map(j=> slot(at(L,'defense',i,j))).join("") +
+          (goalieRow && i<2 ? slot(L && L.goalies ? L.goalies[i] : null) : `<div class="slot blank"></div>`))).join("")}
+      ${special ? ["PP1","PK1"].map(l=> lineRow(l, `<div class="slot wide">&nbsp;</div>`)).join("") : ""}
+    </div>`;
+  };
+  const L = TEAM.lines || {};
+  const byNum = n => r.find(p=>p.number===n);
+  const alaName = n => { const p = byNum(n); return p && tag(p); };
+  const lines = linesGrid(L, alaName);
   const goalies = r.filter(p=>p.position==='G');
+  const gslot = key => `<div class="slot">${(key!=null && alaName(key)) || "&nbsp;"}</div>`;
   const goalieRows = `<div class="lines">
-    ${lineRow("START", slot(L.goalies && L.goalies[0]) + `<div class="slot wide2">&nbsp;</div>`)}
-    ${lineRow("BACKUP", slot(L.goalies && L.goalies[1]) + `<div class="slot wide2">&nbsp;</div>`)}
+    ${lineRow("START", gslot(L.goalies && L.goalies[0]) + `<div class="slot wide2">&nbsp;</div>`)}
+    ${lineRow("BACKUP", gslot(L.goalies && L.goalies[1]) + `<div class="slot wide2">&nbsp;</div>`)}
   </div>` + ul(goalies.map(p=>`${tag(p)} · ${p.classYear}${p.yearsPlaying?` · ${p.yearsPlaying} yrs hockey`:""}${p.hometown?` · ${p.hometown}`:""}`));
+
+  /* opponent lines — names only; no numbers or stats were supplied */
+  const O = typeof OPPONENT !== "undefined" ? OPPONENT : null;
+  const oppName = b => b.lastName ? `<b>${b.lastName.toUpperCase()}</b> ${b.firstName}` : `<b>${b.firstName.toUpperCase()}</b>`;
+  const oppLines = O ? linesGrid(O.lines, id => { const b = O.roster.find(x=>x.id===id); return b && oppName(b); }, {special:false, goalieRow:true, compact:true})
+    + `<div class="ts-legend">${O.roster.filter(b=>b.note).map(b=>`${(b.lastName||b.firstName).toUpperCase()} — ${b.note}`).join(" · ")} · Source: ${O.source}.</div>` : "";
 
   const pos = tally(r, p=>({F:"Forwards",D:"Defense",G:"Goalies"})[p.position]);
   const cls = tally(r, p=>({Fr:"Fr",So:"So",Jr:"Jr",Sr:"Sr",Gr:"Grad"})[p.classYear]);
@@ -188,6 +203,7 @@ function renderTeamSheet(){
     <div class="ts-col">
       ${sec(TEAM.lines ? "LINES" : "LINES — fill in at the rink", lines)}
       ${sec("GOALIES", goalieRows)}
+      ${O ? sec(`${O.name.toUpperCase()} LINES — ${O.note} · no numbers supplied`, oppLines) : ""}
       ${sec("ROSTER BREAKDOWN", breakdown)}
       ${sec("GAME-DAY VERIFY", ul(verify))}
       ${fill("SCORING · PENALTIES")}

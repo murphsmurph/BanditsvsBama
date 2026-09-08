@@ -56,6 +56,8 @@ Alabama stats live per player in `alabamaStats.seasons` (skater rows: `gp g a p 
 
 `TEAM.game` is tonight's game (the fundraiser exhibition vs the HSV Bandits). It feeds both page headers, the Tonight's Game block on page 2 and the event card in Broadcast Mode, and it is kept out of `TEAM.seasons` on purpose.
 
+`OPPONENT` is the Bandits: a names-only roster with ids, and `lines` keyed by those ids. No numbers or stats were supplied. Page 2 prints their lines under Alabama's, and Broadcast Mode lists them (searchable) after the Alabama roster. To fill a slot later, put the player's id in `OPPONENT.lines`; to add a number, set `number` on that player.
+
 Phonetics are two fields so each one is tied to the right name: `sayLast` (surname, printed in red under the surname) and `sayFirst` (first name, printed in red beside the first name). Both come from the team spreadsheet's Last Phonetic / First Phonetic columns.
 
 ## Lines

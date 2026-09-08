@@ -505,3 +505,42 @@ const TEAM = {
     note:"Pasted standings column headers were incomplete; do not invent labels for the ambiguous middle columns."
   }
 };
+
+/* ============================================================
+   OPPONENT — HSV Bandits (men's beer-league team), tonight only.
+   Source: Bandits lines-app screenshots supplied by the broadcaster.
+   No sweater numbers and no stats were supplied, so none are shown.
+   Names as they appear in the app. "El Presidente" in the app is
+   Marc Hodges, Bandits team president (per broadcaster). Only first
+   names were available for Joey and Greg. Kept separate from ROSTER
+   so nothing about the Bandits can leak into Alabama views.
+   ============================================================ */
+const OPPONENT = {
+  name:"HSV Bandits", shortName:"Bandits", note:"men's beer-league team",
+  source:"Bandits lines app screenshots supplied by broadcaster",
+  roster:[
+    {id:"harber",   firstName:"Nate",     lastName:"Harber",   position:"F", number:null, note:null},
+    {id:"joey",     firstName:"Joey",     lastName:null,       position:"F", number:null, note:"first name only in source"},
+    {id:"pelle",    firstName:"Ren",      lastName:"Pelle",    position:"F", number:null, note:null},
+    {id:"ratzlaff", firstName:"Carson",   lastName:"Ratzlaff", position:"F", number:null, note:null},
+    {id:"presley",  firstName:"Taylor",   lastName:"Presley",  position:"F", number:null, note:null},
+    {id:"carini",   firstName:"Steven",   lastName:"Carini",   position:"F", number:null, note:null},
+    {id:"orear",    firstName:"Kyle",     lastName:"O'Rear",   position:"F", number:null, note:"marked ? (unconfirmed) in the lines app"},
+    {id:"newman",   firstName:"Garrett",  lastName:"Newman",   position:"F", number:null, note:null},
+    {id:"freeman",  firstName:"Tucker",   lastName:"Freeman",  position:"F", number:null, note:null},
+    {id:"bowden",   firstName:"Pete",     lastName:"Bowden",   position:"F", number:null, note:null},
+    {id:"hunziker", firstName:"Dennis",   lastName:"Hunziker", position:"D", number:null, note:null},
+    {id:"barrueta", firstName:"Edgar",    lastName:"Barrueta", position:"D", number:null, note:null},
+    {id:"hodges",   firstName:"Marc",     lastName:"Hodges",   position:"D", number:null, note:"Bandits team president"},
+    {id:"kissel",   firstName:"Brian",    lastName:"Kissel",   position:"D", number:null, note:null},
+    {id:"greg",     firstName:"Greg",     lastName:null,       position:"D", number:null, note:"first name only in source"},
+    {id:"roy",      firstName:"Bradley",  lastName:"Roy",      position:"D", number:null, note:null},
+    {id:"ashley",   firstName:"Jonathan", lastName:"Ashley",   position:"G", number:null, note:null}
+  ],
+  /* ids above; null = slot empty in the app */
+  lines:{
+    forwards:[["harber","joey","pelle"],["ratzlaff","presley","carini"],["orear","newman","freeman"],[null,"bowden",null]],
+    defense:[["hunziker","barrueta"],["hodges","kissel"],["greg","roy"]],
+    goalies:["ashley", null]
+  }
+};

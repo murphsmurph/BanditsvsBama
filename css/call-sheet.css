@@ -158,6 +158,12 @@
   min-height:.15in;border:none;background:transparent;
   font-size:8px;font-weight:700;letter-spacing:.8px;color:#555;justify-content:center;
 }
+/* compact, typed grid (opponent lines) — no room needed for handwriting */
+.lines.sm{gap:2px;}
+.lines.sm .line{gap:2px;}
+.lines.sm .slot{min-height:.19in;font-size:9.5px;padding:0 4px;border-color:#bbb;gap:3px;}   /* gap keeps LAST First apart inside the flex slot */
+.lines.sm .lbl{font-size:8px;flex-basis:.36in;}
+.lines.sm .line.hdr .slot{min-height:.12in;font-size:7.5px;}
 
 /* ============================================================
    PRINT — nothing but the finished sheets

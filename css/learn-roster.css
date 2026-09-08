@@ -68,6 +68,9 @@
   padding:8px 10px;margin-bottom:10px;font-size:14px;line-height:1.45;
 }
 .bcast .bcard b{display:inline-block;min-width:92px;color:#f0a6b4;font-size:11px;letter-spacing:1px;}
+.bcast .bdiv{font-size:11px;letter-spacing:1px;color:#9a9a9a;padding:14px 8px 4px;border-bottom:1px solid #262626;}
+.bcast .row.opp{cursor:default;}
+.bcast .bn.opp{background:#333;font-size:15px;}
 .bcast .bnotes li.gen{color:#f0a6b4;font-weight:700;}
 .bcast .bnotes li.rb{color:#9a9a9a;}
 .bcast .bnotes li.dq{color:#f5c26b;}
