@@ -7,7 +7,14 @@ function renderBcast(filter=""){
   const list = activeRoster().filter(p=>
     !f || String(p.number).startsWith(f) ||
     p.lastName.toLowerCase().includes(f) || p.firstName.toLowerCase().includes(f));
-  $('#bcastList').innerHTML = list.map(p=>`
+  const G = TEAM.game;
+  const card = (G && !f) ? `<div class="bcard">
+      <div><b>EVENT</b>${G.label}</div>
+      <div><b>OPPONENT</b>${G.opponent}${G.opponentNote?` — ${G.opponentNote}`:""}</div>
+      <div><b>PURPOSE</b>${G.purpose||""}</div>
+      <div><b>COUNTS?</b>${G.counts===false ? "No — exhibition. " : ""}${G.countsNote||""}</div>
+    </div>` : "";
+  $('#bcastList').innerHTML = card + list.map(p=>`
     <div>
       <div class="row" data-n="${p.number}">
         <div class="bn ${p.position==='G'?'g':''}">${p.number}</div>
@@ -17,7 +24,10 @@ function renderBcast(filter=""){
         </div>
       </div>
       <ul class="bnotes" id="bn${p.number}">
+        ${generatedStatNote(p) ? `<li class="gen">${generatedStatNote(p)}</li>` : ""}
         ${[...p.notes].sort((a,b)=>a.priority-b.priority).map(n=>`<li>${n.text}</li>`).join("")}
+        ${recordBookLine(p) ? `<li class="rb">${recordBookLine(p)}</li>` : ""}
+        ${dqList(p).filter(d=>d.print).map(d=>`<li class="dq">VERIFY · ${d.note}</li>`).join("")}
       </ul>
     </div>`).join("");
   $$('#bcastList .row').forEach(r=> r.onclick = ()=> $('#bn'+r.dataset.n).classList.toggle('open'));

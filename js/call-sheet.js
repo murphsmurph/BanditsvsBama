@@ -4,12 +4,15 @@
    the final text scale after this runs.
    ============================================================ */
 
-/* highest-priority notes only; priority 3 lives in Learn the Roster */
+/* generated Alabama stat line first (priority 0), then narrative notes;
+   priority 3 lives in Learn the Roster. Players with no Alabama games get no stat line. */
 function pickNotes(p, max){
-  return [...p.notes]
+  const generated = generatedStatNote(p);
+  const narrative = [...p.notes]
     .sort((a,b)=>a.priority-b.priority)
-    .filter(n=>n.priority<=2)
-    .slice(0,max);
+    .filter(n=>n.priority<=2);
+  const merged = generated ? [{text:generated, category:"stats", priority:0}, ...narrative] : narrative;
+  return merged.slice(0,max);
 }
 
 function renderCallSheet(){
@@ -24,7 +27,9 @@ function renderCallSheet(){
   rows.innerHTML = roster.map(p=>{
     /* first-name phonetic sits beside the first name; surname phonetic leads the subline under the surname */
     const first = p.sayFirst ? `${p.firstName} <span class="say">(${p.sayFirst})</span>` : p.firstName;
-    const strip = [p.position, first, p.height, p.classYear, p.shoots ? "Shoots "+p.shoots : null]
+    /* goalies show their catching hand, skaters their shooting hand — never "Shoots" for a goalie */
+    const hand = p.position==='G' ? (p.catches ? "Catches "+p.catches : null) : (p.shoots ? "Shoots "+p.shoots : null);
+    const strip = [p.position, first, p.height, p.classYear, hand]
       .filter(Boolean).join(" &nbsp;·&nbsp; ");
     const sub = [p.sayLast ? `<span class="say">${p.sayLast}</span>` : null, p.hometown, p.previousTeam]
       .filter(Boolean).join(" · ");
@@ -83,8 +88,57 @@ function renderTeamSheet(){
     ["Home rink", TEAM.homeRink],
     ["Practice", TEAM.practice]
   ]);
-  const staff = kv(TEAM.staff.map(s=>[s.role, `${s.name} <i>· ${s.from}</i>`]));
+  const staff = kv(TEAM.staff.map(s=>[s.role, `${s.name} <i>· ${s.from}${s.note?" · "+s.note:""}</i>`]));
   const history = ul(TEAM.history);
+
+  /* TONIGHT'S GAME — fundraiser exhibition; stored in TEAM.game, never in seasons */
+  const G = TEAM.game;
+  const tonight = G ? `<div class="tonight">
+      <div class="t1">${G.label}</div>
+      <div class="t2">Alabama Women's Hockey vs ${G.opponent}${G.opponentNote?` — ${G.opponentNote}`:""}</div>
+      <div class="t3">${G.purpose||""}</div>
+      <div class="t3">${G.countsNote||""}</div>
+    </div>` : "";
+
+  /* BY THE NUMBERS — every figure derived from TEAM.seasons / TEAM.recordBook / TEAM.standings2526 */
+  const ABBR = {"South Carolina":"USC","High Point":"HPU"};
+  const short = o => ABBR[o] || o;
+  const ord = n => n + (["th","st","nd","rd"][(n%100>10&&n%100<14)?0:Math.min(n%10,4)] || "th");
+  const dash = s => s.replace("-","–");
+  const pm = n => (n>=0?"+":"")+n;
+  const endYear = s => +s.season.split("-")[0] + 1;
+  const seasonLine = s => {
+    const m = seasonSummary(s); if(!m.gp) return null;
+    const po = s.games.filter(g=>g.type==='playoff' && g.result);
+    const chs = s.chs==='champion' ? `CHS CHAMPION` : s.chs==='finalist' ? `CHS FINALIST` : null;
+    const run = po.length ? ` (${po.map(g=>`${g.result} ${g.gf}–${g.ga} ${short(g.opp)}`).join(" · ")})` : "";
+    return `${dash(s.season)}${s.complete?"":" supplied results"} · ${m.w}–${m.l} · ${m.gf} GF · ${m.ga} GA · ${pm(m.diff)}${chs?` · ${chs}${run}`:""}`;
+  };
+  const agg = aggregateSummary();
+  const seasonsSpan = TEAM.seasons.length ? `${TEAM.seasons[0].season.split("-")[0]}–${String(endYear(TEAM.seasons[TEAM.seasons.length-1])).slice(2)}` : "";
+  const h2h = headToHead();
+  const auburn = h2h.find(h=>h.opp==="Auburn");
+  const restH2H = h2h.filter(h=>h!==auburn && h.gp>=2).map(h=>`${short(h.opp)} ${h.w}–${h.l}${h.l===0?` (${h.gf}–${h.ga})`:""}`);
+  const st = TEAM.standings2526;
+  const rb = TEAM.recordBook;
+  const onRoster = name => r.find(p=>fullName(p)===name);
+  const lead = rb && rb.points.find(e=>e.rank===1);
+  const leadPpg = lead && rb.ppg.find(e=>e.name===lead.name);
+  const others = rb ? rb.points.filter(e=>e.rank>1 && onRoster(e.name)).map(e=>{
+    const g = rb.goals.find(x=>x.name===e.name);
+    return `${surnameOf(e.name)} ${e.p} P${g && g.rank<=2 ? ` / ${e.g} G` : ""}`;
+  }) : [];
+  const pimTop = rb ? rb.pim.filter(e=>e.rank<=2 && onRoster(e.name)).map(e=>`${surnameOf(e.name)} ${e.pim} PIM`) : [];
+  const numbers = [
+    ...TEAM.seasons.filter(s=>s.season!=="2023-24").map(seasonLine),
+    agg.gp ? `${agg.gp} supplied competitive games ${seasonsSpan} · ${agg.w}–${agg.l} · ${agg.gf}–${agg.ga} · ${pm(agg.diff)} · one-goal games ${agg.oneGoal.w}–${agg.oneGoal.l}` : null,
+    auburn ? `<b>VS AUBURN · ${auburn.w}–${auburn.l}</b> · Alabama has outscored Auburn ${auburn.gf}–${auburn.ga} in supplied results` : null,
+    restH2H.length ? `vs ${restH2H.join(" · ")}` : null,
+    st ? `${dash(st.label)} EP snapshot · listed ${ord(st.position)} · ${st.gp} GP · ${st.points} pts` : null,
+    lead ? `${surnameOf(lead.name)} · EP program leader: ${lead.p} P · ${lead.g} G${leadPpg?` · ${leadPpg.ppg.toFixed(2)} P/GP`:""}` : null,
+    (others.length||pimTop.length) ? [...others, ...pimTop].join(" · ") : null
+  ].filter(Boolean);
+  const byNumbers = ul(numbers) + (TEAM.careerLegend ? `<div class="ts-legend">${TEAM.careerLegend}</div>` : "");
   const leaders = r.filter(p=>p.leadership && p.leadership.length)
     .map(p=>`${tag(p)} — ${p.leadership.join(" · ")}`);
   const sayList = r.filter(p=>p.sayLast||p.sayFirst).map(p=>`<b>${p.number}</b> ${sayLine(p)}`);
@@ -117,28 +171,42 @@ function renderTeamSheet(){
     ["Home states", tallyStr(states) + (r.some(p=>!p.hometown) ? ` · ${r.filter(p=>!p.hometown).length} not listed` : "")]
   ]);
 
+  /* only game-call-important conflicts (print:true) make the printed page */
   const verify = [
     "Numbers · scratches · positions · starting goalie",
-    ...r.filter(p=>p.dataQuality).map(p=>`${tag(p)} — ${p.dataQuality.note}`)
+    ...r.flatMap(p=> dqList(p).filter(d=>d.print).map(d=>`${tag(p)} — ${d.note}`))
   ];
 
   $('#tsBody').innerHTML = `
     <div class="ts-col">
+      ${tonight ? sec("TONIGHT'S GAME", tonight) : ""}
       ${sec("PROGRAM", program)}
       ${sec("STAFF", staff)}
       ${sec("HISTORY", history)}
+      ${sec("BY THE NUMBERS", byNumbers)}
       ${sec("LEADERSHIP", ul(leaders))}
-      ${sec("SAY IT RIGHT", ul(sayList))}
       ${fill("GAME NOTES")}
     </div>
     <div class="ts-col">
       ${sec(TEAM.lines ? "LINES" : "LINES — fill in at the rink", lines)}
       ${sec("GOALIES", goalieRows)}
+      ${sec("SAY IT RIGHT", ul(sayList))}
       ${sec("ROSTER BREAKDOWN", breakdown)}
       ${sec("GAME-DAY VERIFY", ul(verify))}
       ${fill("SCORING · PENALTIES")}
     </div>`;
   $('#tsFoot').innerHTML = TEAM.staff.map(s=>`${s.role.replace("Head Coach","HC").replace("Assistant Coach","AC").replace("Head of Staff","HoS")} ${s.name}`).join(" &nbsp;·&nbsp; ");
+}
+
+/* both page headers come from TEAM.game; page 1 carries one short descriptor, page 2 the full story */
+function renderGameHeads(){
+  const G = TEAM.game; if(!G) return;
+  const vs = `ALABAMA&nbsp;<em>vs</em>&nbsp;${G.opponent.replace(/^HSV /,"").toUpperCase()}`;
+  $('#callSheet .cs-head .r').innerHTML =
+    `<span>${vs} &nbsp;·&nbsp; ${G.date} &nbsp;·&nbsp; ${G.time}</span>` +
+    (G.counts===false ? `<small>${G.label} · SUPPORTING ALABAMA WOMEN'S HOCKEY · NON-COUNTING GAME</small>` : "");
+  $('#teamSheet .cs-head .r').innerHTML = `<span>TEAM SHEET &nbsp;·&nbsp; ${vs} &nbsp;·&nbsp; ${G.date}</span>` +
+    (G.counts===false ? `<small>${G.label} · NON-COUNTING GAME</small>` : "");
 }
 
 /* screen preview: scale each letter page down to fit the window, never distort it */

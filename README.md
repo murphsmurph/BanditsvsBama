@@ -46,7 +46,15 @@ Everything is in `js/roster-data.js`. Each player has `notes: [{text, category, 
 - `priority: 2` — printed if the row has room
 - `priority: 3` — Learn the Roster only
 
-Missing facts stay `null`. Never invent. Conflicts between sources go in `dataQuality: {note: "..."}` and surface as a warning in the study panel and on page 2 under Game-Day Verify.
+Missing facts stay `null`. Never invent. Conflicts between sources go in a `dataQuality` array (`{field, keep, alternate, alternateSource, note, print}`); every entry shows in the study panel, and `print:true` entries also print on page 2 under Game-Day Verify.
+
+## Stats
+
+Alabama stats live per player in `alabamaStats.seasons` (skater rows: `gp g a p pim`; goalie rows: `gp gaa svPct ga saves so w l t minutes`). Only Alabama seasons go in: 2024-25 AAU (W) and 2025-26 ACDC (W). Career totals are never typed in — `getAlabamaSkaterTotals()` / `getAlabamaGoalieTotals()` in `js/app.js` sum the rows, and `generatedStatNote()` builds the page-1 bullet ("ALA · 23 GP · 13G–4A–17P"), so fixing a season row fixes every view. Prior clubs are names only (`previousTeam`); their numbers never count.
+
+`TEAM.recordBook` is the Elite Prospects program record book (points, goals, P/GP, PIM, GP). `TEAM.seasons` holds game rows; `seasonSummary()`, `aggregateSummary()` and `headToHead()` derive W-L / GF / GA, one-goal record and per-opponent history, skipping practice and cancelled games (`counts:false`). A season with `complete:false` is labelled "supplied results", never presented as a season record.
+
+`TEAM.game` is tonight's game (the fundraiser exhibition vs the HSV Bandits). It feeds both page headers, the Tonight's Game block on page 2 and the event card in Broadcast Mode, and it is kept out of `TEAM.seasons` on purpose.
 
 Phonetics are two fields so each one is tied to the right name: `sayLast` (surname, printed in red under the surname) and `sayFirst` (first name, printed in red beside the first name). Both come from the team spreadsheet's Last Phonetic / First Phonetic columns.
 

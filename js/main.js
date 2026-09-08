@@ -1,6 +1,7 @@
 /* ============================================================
    BOOT — runs last. Order matters: data → app → views → fit.
    ============================================================ */
+renderGameHeads();
 renderCallSheet();
 renderTeamSheet();
 renderTeamCard();
