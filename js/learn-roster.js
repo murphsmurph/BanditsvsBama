@@ -71,7 +71,7 @@ function openStudy(num){
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
       <div>
         <h2><em>#${p.number}</em> ${p.firstName} ${p.lastName}</h2>
-        <div class="sub">${p.role} · ${p.classYear}${p.height?" · "+p.height:""}${p.hometown?" · "+p.hometown:""}${p.say?` · <span class="say">${p.say}</span>`:""}</div>
+        <div class="sub">${p.role} · ${p.classYear}${p.height?" · "+p.height:""}${p.hometown?" · "+p.hometown:""}${sayLine(p)?` · <span class="say">${sayLine(p)}</span>`:""}</div>
       </div>
       <button class="chip" id="closeModal">CLOSE</button>
     </div>
@@ -83,7 +83,7 @@ function openStudy(num){
       <b>Shoots</b><span>${p.shoots||"—"}</span>
       <b>Hometown</b><span>${p.hometown||"—"}</span>
       <b>Born</b><span>${p.dob||"—"}</span>
-      <b>Say it</b><span>${p.say||"as spelled"}</span>
+      <b>Say it</b><span>${sayLine(p)||"as spelled"}</span>
     </div>`)}
     ${sec("Hockey", `<div class="kv">
       <b>Previous team</b><span>${p.previousTeam||"—"}</span>

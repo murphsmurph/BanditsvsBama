@@ -8,14 +8,14 @@
    doesn't.
    ============================================================ */
 .sheet-stage{display:flex;justify-content:center;}
-.call-sheet{
-  --scale:1;
+.print-page{
   width:8.14in;height:10.64in;
   background:#fff;color:#000;
   overflow:hidden;
   display:flex;flex-direction:column;
   transform-origin:top center;
 }
+.call-sheet{ --scale:1; }
 
 /* header / column header / footer are fixed-height */
 .cs-head{
@@ -77,6 +77,7 @@
   font-size:calc(7.2px * var(--scale));letter-spacing:.3px;color:#333;text-transform:uppercase;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
+.strip .say{text-transform:none;letter-spacing:0;}   /* keep stress caps as written: (nay-OH-mee) */
 .surname{
   font-weight:700;font-size:calc(16px * var(--scale));line-height:1.02;letter-spacing:-.2px;
   white-space:nowrap;overflow:hidden;
@@ -99,7 +100,58 @@
 .notes-cell li:before{content:"•";position:absolute;left:0;color:var(--bama-crimson);}
 
 /* ============================================================
-   PRINT — nothing but the finished sheet
+   TEAM SHEET — page 2. Fixed sizes (no --scale): the content is
+   TEAM data + roster counts, so it does not change with notes.
+   ============================================================ */
+.team-sheet{ margin-top:14px; }
+.ts-body{
+  flex:1 1 auto;min-height:0;
+  display:grid;grid-template-columns:minmax(0,42fr) minmax(0,58fr);
+  padding:6px 8px 5px;gap:0 10px;
+}
+.ts-col{min-height:0;min-width:0;overflow:hidden;display:flex;flex-direction:column;}
+.ts-col:first-child{border-right:2px solid var(--bama-crimson);padding-right:10px;}
+.ts-sec{margin-bottom:8px;flex:0 0 auto;}
+.ts-sec h3{
+  font-size:8.5px;letter-spacing:1.2px;margin:0 0 4px;
+  color:#fff;background:var(--black);display:inline-block;padding:2px 6px;
+}
+.ts-sec ul{margin:0;padding-left:11px;font-size:10.5px;line-height:1.32;}
+.ts-sec li{padding-left:1px;}
+.ts-sec li::marker{color:var(--bama-crimson);}
+.ts-kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2.5px 8px;font-size:10.5px;line-height:1.32;}
+.ts-kv b{color:#555;font-weight:400;white-space:nowrap;}
+.ts-kv i{font-style:normal;color:#666;}
+.ts-sec b{font-weight:700;}
+
+/* ruled write-in blocks: they absorb whatever height is left, so page 2 cannot overflow */
+.ts-sec.fill{
+  flex:1 1 auto;min-height:.6in;margin-bottom:0;
+  display:flex;flex-direction:column;
+}
+.ts-sec.fill h3{align-self:flex-start;}
+.ts-sec.fill .rule{
+  flex:1 1 auto;min-height:0;
+  background:repeating-linear-gradient(to bottom, transparent 0 .27in, #bdbdbd .27in calc(.27in + .75px));
+}
+
+/* lines grid — boxes big enough to write a name in by hand */
+.lines{display:flex;flex-direction:column;gap:3px;margin-bottom:4px;}
+.line{display:flex;gap:3px;align-items:stretch;}
+.line .lbl{flex:0 0 .5in;font-size:9px;font-weight:700;letter-spacing:.5px;display:flex;align-items:center;color:#333;}
+.line .slot{
+  flex:1 1 0;min-width:0;min-height:.29in;border:.75px solid #999;padding:1px 5px;
+  font-size:10.5px;display:flex;align-items:center;background:#fff;white-space:nowrap;overflow:hidden;
+}
+.line .slot.blank{border:none;background:transparent;}
+.line .slot.wide,.line .slot.wide2{flex:2 1 0;}
+.line.hdr .slot{
+  min-height:.15in;border:none;background:transparent;
+  font-size:8px;font-weight:700;letter-spacing:.8px;color:#555;justify-content:center;
+}
+
+/* ============================================================
+   PRINT — nothing but the finished sheets
    ============================================================ */
 @page{ size:Letter portrait; margin:0.18in; }
 @media print{
@@ -108,10 +160,11 @@
   #view-learn,#view-flash,#view-quiz,#view-bcast,.modal{display:none !important;}
   #view-sheet{display:block !important;padding:0 !important;}
   .sheet-stage{display:block !important;height:auto !important;}
-  .call-sheet{
+  .print-page{
     display:flex !important;transform:none !important;
     width:8.14in;height:10.64in;box-shadow:none !important;margin:0 !important;
     -webkit-print-color-adjust:exact;print-color-adjust:exact;
   }
+  .team-sheet{break-before:page;page-break-before:always;}
   .player-row{break-inside:avoid;page-break-inside:avoid;}
 }

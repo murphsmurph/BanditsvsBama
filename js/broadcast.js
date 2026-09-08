@@ -13,7 +13,7 @@ function renderBcast(filter=""){
         <div class="bn ${p.position==='G'?'g':''}">${p.number}</div>
         <div>
           <div class="bname">${p.lastName.toUpperCase()}</div>
-          <div class="bmeta">${p.firstName} · ${p.role} · ${p.classYear}${p.hometown?" · "+p.hometown:""}${p.say?" · "+p.say:""}</div>
+          <div class="bmeta">${p.firstName} · ${p.role} · ${p.classYear}${p.hometown?" · "+p.hometown:""}${sayLine(p)?" · "+sayLine(p):""}</div>
         </div>
       </div>
       <ul class="bnotes" id="bn${p.number}">

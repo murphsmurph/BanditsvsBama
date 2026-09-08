@@ -36,9 +36,10 @@
   <div class="note screen-only">
     Sorted by sweater number. Text auto-shrinks until every row fits on one Letter page; use TEXT − / + to set your preferred size.
     <span id="rosterCount"></span>
+    Page 2 (team sheet) prints behind it.
   </div>
   <div class="sheet-stage">
-    <div class="call-sheet" id="callSheet">
+    <div class="print-page call-sheet" id="callSheet">
       <div class="cs-head">
         <div class="l">ALABAMA WOMEN'S HOCKEY</div>
         <div class="r">ALABAMA&nbsp;<em>vs</em>&nbsp;BANDITS &nbsp;·&nbsp; FRI SEP 11, 2026 &nbsp;·&nbsp; 8:45 PM CT</div>
@@ -52,6 +53,26 @@
         <span>GAME-DAY VERIFY: numbers · scratches · positions · starting goalie</span>
         <span>HC Jeffery Edmiston &nbsp;·&nbsp; AC Anya Laxton</span>
         <span id="footCount"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- page 2: team sheet. Built by renderTeamSheet() from TEAM + ROSTER. -->
+  <div class="sheet-stage">
+    <div class="print-page team-sheet" id="teamSheet">
+      <div class="cs-head">
+        <div class="l">ALABAMA WOMEN'S HOCKEY</div>
+        <div class="r">TEAM SHEET &nbsp;·&nbsp; ALABAMA&nbsp;<em>vs</em>&nbsp;BANDITS &nbsp;·&nbsp; FRI SEP 11, 2026</div>
+      </div>
+      <div class="cs-colhead">
+        <div class="a">PROGRAM · STAFF · HISTORY · LEADERSHIP · PHONETICS</div>
+        <div class="b">LINES · GOALIES · BREAKDOWN · GAME-DAY VERIFY</div>
+      </div>
+      <div class="ts-body" id="tsBody"></div>
+      <div class="cs-foot">
+        <span>PAGE 2 OF 2 · TEAM SHEET</span>
+        <span id="tsFoot"></span>
+        <span>CHS = College Hockey South (conference)</span>
       </div>
     </div>
   </div>

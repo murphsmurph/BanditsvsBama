@@ -22,7 +22,7 @@ function renderFlash(){
   pState(p.number).seen = true; saveProgress();
   $('#flashNum').textContent = "#"+p.number;
   $('#flashName').firstChild.nodeValue = p.firstName+" "+p.lastName;
-  $('#flashMeta').innerHTML = `${p.role} · ${p.hometown||"—"}${p.say?`<br><span class="say">${p.say}</span>`:""}`;
+  $('#flashMeta').innerHTML = `${p.role} · ${p.hometown||"—"}${sayLine(p)?`<br><span class="say">${sayLine(p)}</span>`:""}`;
   $('#flashBack').style.display = 'none';
   $('#flashFront').style.display = 'block';
   $('#flashPos').textContent = `Card ${flashIdx+1} of ${flashDeck.length}${weakOnly?" · weak players only":""}`;

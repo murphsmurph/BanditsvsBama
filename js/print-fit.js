@@ -47,13 +47,27 @@ function autoFit(){
   reportFit(over, s);
 }
 
+/* page 2 has fixed text sizes; it can only overflow if content is added */
+function teamOverflow(){
+  const ts = $('#teamSheet');
+  if(!ts) return 0;
+  let over = ts.scrollHeight - ts.clientHeight;
+  $$('#teamSheet .ts-col').forEach(c=>{ over = Math.max(over, c.scrollHeight - c.clientHeight); });
+  return Math.max(0, over);
+}
+
 function reportFit(over, s){
   const badge = $('#fitBadge');
   const pct = Math.round(s*100);
+  const tOver = teamOverflow();
   if(over > 0.5){
     badge.className = "fit-badge fit-fail";
     badge.textContent = `PRINT FIT: FAIL — ${Math.ceil(over)}px over at ${pct}% (trim a note)`;
     console.error('CALL SHEET OVERFLOW', over);
+  } else if(tOver > 0.5){
+    badge.className = "fit-badge fit-fail";
+    badge.textContent = `PRINT FIT: FAIL — team sheet ${Math.ceil(tOver)}px over (trim page 2)`;
+    console.error('TEAM SHEET OVERFLOW', tOver);
   } else {
     badge.className = "fit-badge fit-pass";
     badge.textContent = `PRINT FIT: PASS · text ${pct}%`;

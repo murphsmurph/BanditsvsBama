@@ -2,6 +2,7 @@
    BOOT — runs last. Order matters: data → app → views → fit.
    ============================================================ */
 renderCallSheet();
+renderTeamSheet();
 renderTeamCard();
 renderGrid();
 renderBcast();

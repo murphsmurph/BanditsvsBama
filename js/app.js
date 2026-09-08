@@ -8,6 +8,13 @@ const $$ = s => Array.from(document.querySelectorAll(s));
 /* roster sorted by sweater number — the one order every view uses */
 const activeRoster = () => [...ROSTER].sort((a,b)=>a.number-b.number);
 
+/* phonetics: sayLast is the surname, sayFirst the first name.
+   sayLine(p) → "ESCOFFIER = es-co-fee-ay" / "Naomi = nay-OH-mee" / both / "" */
+const sayLine = p => [
+  p.sayLast  ? `${p.lastName.toUpperCase()} = ${p.sayLast}` : null,
+  p.sayFirst ? `${p.firstName} = ${p.sayFirst}` : null
+].filter(Boolean).join(" · ");
+
 /* localStorage with an in-memory fallback (file:// in some browsers blocks storage) */
 let mem = {};
 const store = {
