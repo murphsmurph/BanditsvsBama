@@ -8,7 +8,12 @@
    doesn't.
    ============================================================ */
 .sheet-stage{display:flex;justify-content:center;}
+/* actual-size preview: pages at 8.5 × 11, paper shadow, sideways scroll on narrow windows */
+.preview .sheet-stage{overflow-x:auto;justify-content:safe center;}
+.preview .print-page{box-shadow:0 4px 18px rgba(0,0,0,.35);}
+.preview .team-sheet{margin-top:24px;}
 .print-page{
+  flex:0 0 auto;                 /* never let a narrow window squeeze the page — it is scaled, not shrunk */
   width:8.14in;height:10.64in;
   background:#fff;color:#000;
   overflow:hidden;

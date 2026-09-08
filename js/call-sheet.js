@@ -289,19 +289,27 @@ function renderGameHeads(){
     (G.counts===false ? `<small>${G.label} · NON-COUNTING GAME</small>` : "");
 }
 
-/* screen preview: scale each letter page down to fit the window, never distort it */
+/* screen preview: scale each letter page down to fit the window, never distort it.
+   PREVIEW 8.5 × 11 toggles actual size (scale 1) so you see exactly what prints. */
+let previewActual = false;
 function scaleSheet(){
   $$('.sheet-stage').forEach(stage=>{
     const page = stage.firstElementChild;
     if(!stage.offsetWidth || !page) return;
     const avail = stage.offsetWidth - 8;
     const natural = 8.14 * 96;
-    const scale = Math.min(1, avail / natural);
+    const scale = previewActual ? 1 : Math.min(1, avail / natural);
     page.style.transform = `scale(${scale})`;
     stage.style.height = (10.64 * 96 * scale + 20) + "px";
   });
 }
 
 $('#btnPrint').onclick = ()=> { autoFit(); window.print(); };
-$('#btnPreview').onclick = ()=>{ showView('sheet'); window.scrollTo({top:0,behavior:'smooth'}); };
+$('#btnPreview').onclick = ()=>{
+  previewActual = !previewActual;
+  document.body.classList.toggle('preview', previewActual);
+  $('#btnPreview').textContent = previewActual ? "FIT TO WINDOW" : "PREVIEW 8.5 × 11";
+  showView('sheet');
+  window.scrollTo({top:0, behavior:'smooth'});
+};
 window.addEventListener('resize', scaleSheet);
