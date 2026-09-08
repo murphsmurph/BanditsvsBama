@@ -46,7 +46,7 @@ Everything is in `js/roster-data.js`. Each player has `notes: [{text, category, 
 - `priority: 2` — printed if the row has room
 - `priority: 3` — Learn the Roster only
 
-Missing facts stay `null`. Never invent. Conflicts between sources go in a `dataQuality` array (`{field, keep, alternate, alternateSource, note, print}`); every entry shows in the study panel, and `print:true` entries also print on page 2 under Game-Day Verify.
+Missing facts stay `null`. Never invent. Conflicts between sources go in a `dataQuality` array (`{field, keep, alternate, alternateSource, note, print}`); every entry shows in the study panel, and `print:true` entries also appear as VERIFY lines in Broadcast Mode.
 
 ## Stats
 

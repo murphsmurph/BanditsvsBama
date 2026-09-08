@@ -123,19 +123,21 @@ function renderTeamSheet(){
   const onRoster = name => r.find(p=>fullName(p)===name);
   const lead = rb && rb.points.find(e=>e.rank===1);
   const leadPpg = lead && rb.ppg.find(e=>e.name===lead.name);
-  const others = rb ? rb.points.filter(e=>e.rank>1 && onRoster(e.name)).map(e=>{
-    const g = rb.goals.find(x=>x.name===e.name);
-    return `${surnameOf(e.name)} ${e.p} P${g && g.rank<=2 ? ` / ${e.g} G` : ""}`;
-  }) : [];
-  const pimTop = rb ? rb.pim.filter(e=>e.rank<=2 && onRoster(e.name)).map(e=>`${surnameOf(e.name)} ${e.pim} PIM`) : [];
+  /* returning scorers: Alabama career points, current roster only (derived from season rows) */
+  const scorers = r.map(p=>({p, t:getAlabamaSkaterTotals(p)})).filter(x=>x.t && x.t.p>0)
+    .sort((a,b)=>b.t.p-a.t.p || b.t.g-a.t.g).slice(0,6);
+  const s2425full = TEAM.seasons.find(s=>s.season==="2024-25" && s.complete);
+  const s25 = s2425full ? seasonSummary(s2425full) : null;
+  const bestWin = allCountingGames().filter(g=>g.result==='W').sort((a,b)=>(b.gf-b.ga)-(a.gf-a.ga))[0];
   const numbers = [
     ...TEAM.seasons.filter(s=>s.season!=="2023-24").map(seasonLine),
     agg.gp ? `${agg.gp} supplied competitive games ${seasonsSpan} · ${agg.w}–${agg.l} · ${agg.gf}–${agg.ga} · ${pm(agg.diff)} · one-goal games ${agg.oneGoal.w}–${agg.oneGoal.l}` : null,
+    s25 && s25.gp ? `${dash(s2425full.season)} averaged ${(s25.gf/s25.gp).toFixed(1)} GF / ${(s25.ga/s25.gp).toFixed(1)} GA per game${bestWin?` · biggest supplied win ${bestWin.gf}–${bestWin.ga} vs ${bestWin.opp}${bestWin.when?` (${bestWin.when})`:""}`:""}` : null,
+    scorers.length ? `Returning scorers (Alabama career P) · ${scorers.map(x=>`${x.p.lastName} ${x.t.p}`).join(" · ")}` : null,
     auburn ? `<b>VS AUBURN · ${auburn.w}–${auburn.l}</b> · Alabama has outscored Auburn ${auburn.gf}–${auburn.ga} in supplied results` : null,
     restH2H.length ? `vs ${restH2H.join(" · ")}` : null,
     st ? `${dash(st.label)} EP snapshot · listed ${ord(st.position)} · ${st.gp} GP · ${st.points} pts` : null,
-    lead ? `${surnameOf(lead.name)} · EP program leader: ${lead.p} P · ${lead.g} G${leadPpg?` · ${leadPpg.ppg.toFixed(2)} P/GP`:""}` : null,
-    (others.length||pimTop.length) ? [...others, ...pimTop].join(" · ") : null
+    lead ? `${surnameOf(lead.name)} · EP program leader: ${lead.p} P · ${lead.g} G${leadPpg?` · ${leadPpg.ppg.toFixed(2)} P/GP`:""}` : null
   ].filter(Boolean);
   const byNumbers = ul(numbers) + (TEAM.careerLegend ? `<div class="ts-legend">${TEAM.careerLegend}</div>` : "");
   const leaders = r.filter(p=>p.leadership && p.leadership.length)
@@ -184,12 +186,6 @@ function renderTeamSheet(){
     ["Home states", tallyStr(states) + (r.some(p=>!p.hometown) ? ` · ${r.filter(p=>!p.hometown).length} not listed` : "")]
   ]);
 
-  /* only game-call-important conflicts (print:true) make the printed page */
-  const verify = [
-    "Numbers · scratches · positions · starting goalie",
-    ...r.flatMap(p=> dqList(p).filter(d=>d.print).map(d=>`${tag(p)} — ${d.note}`))
-  ];
-
   $('#tsBody').innerHTML = `
     <div class="ts-col">
       ${tonight ? sec("TONIGHT'S GAME", tonight) : ""}
@@ -205,8 +201,7 @@ function renderTeamSheet(){
       ${sec("GOALIES", goalieRows)}
       ${O ? sec(`${O.name.toUpperCase()} LINES — ${O.note} · no numbers supplied`, oppLines) : ""}
       ${sec("ROSTER BREAKDOWN", breakdown)}
-      ${sec("GAME-DAY VERIFY", ul(verify))}
-      ${fill("SCORING · PENALTIES")}
+      ${fill("GAME NOTES · SCORING · PENALTIES")}
     </div>`;
   $('#tsFoot').innerHTML = TEAM.staff.map(s=>`${s.role.replace("Head Coach","HC").replace("Assistant Coach","AC").replace("Head of Staff","HoS")} ${s.name}`).join(" &nbsp;·&nbsp; ");
 }
