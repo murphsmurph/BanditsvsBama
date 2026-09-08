@@ -389,13 +389,25 @@ const TEAM = {
     heading:"Support Alabama Women's Hockey",
     gamePurpose:"The Bandits exhibition is being played to help raise money for and support the Alabama women's hockey program."
   },
-  /* Line chart for the team sheet (page 2). No lines have been provided
-     yet, so this stays null and the grid prints blank to fill in at the
-     rink. When the coaches send lines, use sweater numbers:
-       lines:{ forwards:[[lw,c,rw],[..],[..],[..]],
-               defense:[[ld,rd],[..],[..]],
-               goalies:[starter, backup] }                                */
-  lines:null,
+  /* Lineup for tonight, from Coach Edmiston's handwritten lineup sheet
+     (9/11/26, opponent Bandits). Sweater numbers throughout. The sheet
+     lists forward trios and D pairs WITHOUT LW/C/RW or LD/RD labels, so
+     the order is kept exactly as written and columns are unlabeled.
+     null = empty box on the sheet. Sheet spellings (Massy, Excoffier,
+     Larose, Vandyne) are mapped to the roster's official spellings.   */
+  lines:{
+    source:"Coach Jeffery Edmiston's lineup sheet, 9/11/26 vs Bandits",
+    columnsLabeled:false,
+    forwards:[[14,41,11],[26,10,18],[27,28,15],[null,null,7]],
+    defense:[[9,46],[3,2],[4,31]],
+    extraDefense:[93],
+    goalies:[30,null],
+    pp:[[14,41,93,11,3],[26,10,4,9,31]],
+    pk:[[27,15,2,46],[28,18,9,93]],
+    scratched:[],
+    notListed:[5,6,84],
+    notListedNote:"appear nowhere on the coach's sheet, not in Scratched either — verify at the rink"
+  },
 
   /* Alabama-only career legend, printed on page 2 */
   careerLegend:"PLAYER CAREER LINE = Alabama AAU (2024–25) + ACDC (2025–26) only.",

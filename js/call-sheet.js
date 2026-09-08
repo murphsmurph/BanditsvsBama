@@ -28,7 +28,9 @@ function renderCallSheet(){
     const first = p.sayFirst ? `${p.firstName} <span class="say">(${p.sayFirst})</span>` : p.firstName;
     /* goalies show their catching hand, skaters their shooting hand — never "Shoots" for a goalie */
     const hand = p.position==='G' ? (p.catches ? "Catches "+p.catches : null) : (p.shoots ? "Shoots "+p.shoots : null);
-    const strip = [p.position, first, p.height, p.classYear, hand]
+    /* tonight's line / special-teams slots sit right after the position so they never get truncated */
+    const tags = lineTags(p);
+    const strip = [p.position, tags.length ? `<span class="ln">${tags.join(" · ")}</span>` : null, first, p.height, p.classYear, hand]
       .filter(Boolean).join(" &nbsp;·&nbsp; ");
     const sub = [p.sayLast ? `<span class="say">${p.sayLast}</span>` : null, p.hometown, p.previousTeam]
       .filter(Boolean).join(" · ");
@@ -54,15 +56,17 @@ function renderCallSheet(){
    Max size follows --scale; min is a hard floor for legibility. */
 function fitAllNames(){
   const scale = parseFloat(getComputedStyle($('#callSheet')).getPropertyValue('--scale')) || 1;
-  const max = 16 * scale, min = 9.5;
-  $$('.surname[data-fit]').forEach(el=>{
+  const shrink = (els, max, min, step) => els.forEach(el=>{
     let size = max;
     el.style.fontSize = size+"px";
     while(el.scrollWidth > el.clientWidth && size > min){
-      size -= 0.5;
+      size -= step;
       el.style.fontSize = size+"px";
     }
   });
+  shrink($$('.surname[data-fit]'), 16 * scale, 9.5, 0.5);
+  /* the quick-ID strip (position · line tags · first name · height · class · hand) shrinks a little rather than truncating */
+  shrink($$('.strip'), 7.2 * scale, 6, 0.2);
 }
 
 /* ============================================================
@@ -149,32 +153,38 @@ function renderTeamSheet(){
   const lineRow = (lbl, cells) => `<div class="line"><div class="lbl">${lbl}</div>${cells}</div>`;
   const hdr = cols => `<div class="line hdr"><div class="lbl"></div>${cols.map(c=>`<div class="slot">${c}</div>`).join("")}</div>`;
   const at = (L, group, i, j) => L && L[group] && L[group][i] ? L[group][i][j] : null;
-  const linesGrid = (L, resolve, {special=true, goalieRow=false, compact=false}={}) => {
+  /* filled = lines exist (compact, typed); blank = write-in boxes. Column labels only when the source labels them. */
+  const linesGrid = (L, resolve) => {
+    const filled = !!(L && L.forwards);
+    const labeled = !L || L.columnsLabeled !== false;
     const slot = (key, cls="") => `<div class="slot ${cls}">${(key!=null && resolve(key)) || "&nbsp;"}</div>`;
-    return `<div class="lines${compact?" sm":""}">
-      ${hdr(["LW","C","RW"])}
+    const extra = filled && L.extraDefense && L.extraDefense.length
+      ? lineRow("7D", L.extraDefense.map(k=>slot(k)).join("") + `<div class="slot blank"></div>`.repeat(Math.max(0, 3-L.extraDefense.length))) : "";
+    return `<div class="lines${filled?" sm":""}">
+      ${hdr(labeled ? ["LW","C","RW"] : ["","",""])}
       ${[0,1,2,3].map(i=> lineRow("F"+(i+1), [0,1,2].map(j=> slot(at(L,'forwards',i,j))).join(""))).join("")}
-      ${hdr(["LD","RD",goalieRow?"G":""])}
+      ${hdr(labeled ? ["LD","RD","G"] : ["","","G"])}
       ${[0,1,2].map(i=> lineRow("D"+(i+1), [0,1].map(j=> slot(at(L,'defense',i,j))).join("") +
-          (goalieRow && i<2 ? slot(L && L.goalies ? L.goalies[i] : null) : `<div class="slot blank"></div>`))).join("")}
-      ${special ? ["PP1","PK1"].map(l=> lineRow(l, `<div class="slot wide">&nbsp;</div>`)).join("") : ""}
+          (i<2 ? slot(L && L.goalies ? L.goalies[i] : null) : `<div class="slot blank"></div>`))).join("")}
+      ${extra}
+      ${filled ? "" : ["PP1","PK1"].map(l=> lineRow(l, `<div class="slot wide">&nbsp;</div>`)).join("")}
     </div>`;
   };
-  const L = TEAM.lines || {};
+  const L = TEAM.lines || null;
   const byNum = n => r.find(p=>p.number===n);
   const alaName = n => { const p = byNum(n); return p && tag(p); };
-  const lines = linesGrid(L, alaName);
+  const names = keys => (keys||[]).map(alaName).filter(Boolean).join(" · ");
+  const lines = linesGrid(L, alaName)
+    + (L && L.notListed && L.notListed.length ? `<div class="ts-legend"><b>Not on the coach's sheet:</b> ${names(L.notListed)} — ${L.notListedNote||"verify"}</div>` : "");
+  const special = L && (L.pp || L.pk) ? kv([
+    ...(L.pp||[]).map((u,i)=>["PP"+(i+1), names(u)]),
+    ...(L.pk||[]).map((u,i)=>["PK"+(i+1), names(u)])
+  ]) : "";
   const goalies = r.filter(p=>p.position==='G');
-  const gslot = key => `<div class="slot">${(key!=null && alaName(key)) || "&nbsp;"}</div>`;
-  const goalieRows = `<div class="lines">
-    ${lineRow("START", gslot(L.goalies && L.goalies[0]) + `<div class="slot wide2">&nbsp;</div>`)}
-    ${lineRow("BACKUP", gslot(L.goalies && L.goalies[1]) + `<div class="slot wide2">&nbsp;</div>`)}
-  </div>` + ul(goalies.map(p=>`${tag(p)} · ${p.classYear}${p.yearsPlaying?` · ${p.yearsPlaying} yrs hockey`:""}${p.hometown?` · ${p.hometown}`:""}`));
-
-  /* opponent lines — names only; no numbers or stats were supplied */
-  const O = typeof OPPONENT !== "undefined" ? OPPONENT : null;
-  const oppName = b => b.lastName ? `<b>${b.lastName.toUpperCase()}</b> ${b.firstName}` : `<b>${b.firstName.toUpperCase()}</b>`;
-  const oppLines = O ? linesGrid(O.lines, id => { const b = O.roster.find(x=>x.id===id); return b && oppName(b); }, {special:false, goalieRow:true, compact:true}) : "";
+  const goalieRows = ul(goalies.map(p=>{
+    const t = lineTags(p).filter(x=>/START|BACKUP|SCRATCHED|NOT ON/.test(x));
+    return `${tag(p)}${t.length?` <span class="ln">${t.join(" · ")}</span>`:""} · ${p.classYear}${p.yearsPlaying?` · ${p.yearsPlaying} yrs hockey`:""}${p.hometown?` · ${p.hometown}`:""}`;
+  }));
 
   const pos = tally(r, p=>({F:"Forwards",D:"Defense",G:"Goalies"})[p.position]);
   const cls = tally(r, p=>({Fr:"Fr",So:"So",Jr:"Jr",Sr:"Sr",Gr:"Grad"})[p.classYear]);
@@ -196,9 +206,9 @@ function renderTeamSheet(){
       ${fill("GAME NOTES")}
     </div>
     <div class="ts-col">
-      ${sec(TEAM.lines ? "LINES" : "LINES — fill in at the rink", lines)}
+      ${sec(L ? `LINES — ${L.source}` : "LINES — fill in at the rink", lines)}
+      ${special ? sec("POWER PLAY · PENALTY KILL", special) : ""}
       ${sec("GOALIES", goalieRows)}
-      ${O ? sec(`${O.name.toUpperCase()} LINES — ${O.note} · no numbers supplied`, oppLines) : ""}
       ${sec("ROSTER BREAKDOWN", breakdown)}
       ${fill("GAME NOTES · SCORING · PENALTIES")}
     </div>`;

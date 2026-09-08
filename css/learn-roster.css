@@ -60,6 +60,7 @@
 .bcast .bn.g{background:#333;}
 .bcast .bname{font-size:22px;font-weight:700;line-height:1;}
 .bcast .bmeta{font-size:12px;color:#9a9a9a;}
+.bcast .bmeta .ln{color:#f0a6b4;font-weight:700;}
 .bcast .bnotes{display:none;padding:6px 8px 12px 62px;background:#141414;}
 .bcast .bnotes.open{display:block;}
 .bcast .bnotes li{font-size:14px;line-height:1.5;}

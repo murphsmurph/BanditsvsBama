@@ -79,6 +79,7 @@
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .strip .say{text-transform:none;letter-spacing:0;}   /* keep stress caps as written: (nay-OH-mee) */
+.ln{color:var(--bama-crimson);font-weight:700;}      /* tonight's line / special-teams slots */
 .surname{
   font-weight:700;font-size:calc(16px * var(--scale));line-height:1.02;letter-spacing:-.2px;
   white-space:nowrap;overflow:hidden;

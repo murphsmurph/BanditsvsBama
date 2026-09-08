@@ -100,6 +100,7 @@ function openStudy(num){
     </div>
     ${photoBox(p,"ph")}
     ${sec("Identity", `<div class="kv">
+      <b>Tonight</b><span>${lineTags(p).join(" · ") || "—"}</span>
       <b>Position</b><span>${p.role} (${p.position})</span>
       <b>Class</b><span>${p.classYear}</span>
       <b>Height</b><span>${p.height||"—"}</span>

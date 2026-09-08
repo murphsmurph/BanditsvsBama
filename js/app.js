@@ -99,6 +99,22 @@ function noteCandidates(p){
   return [...gen, ...p.notes].sort((a,b)=>a.priority-b.priority);
 }
 
+/* where a player sits in tonight's lineup: ["F1","PP1"], ["D2","PK2"], ["START"], ["NOT ON LINEUP"] … */
+function lineTags(p){
+  const L = TEAM.lines; if(!L) return [];
+  const n = p.number, t = [];
+  const has = row => Array.isArray(row) && row.includes(n);
+  (L.forwards||[]).forEach((row,i)=>{ if(has(row)) t.push("F"+(i+1)); });
+  (L.defense||[]).forEach((row,i)=>{ if(has(row)) t.push("D"+(i+1)); });
+  if(has(L.extraDefense)) t.push("7D");
+  if((L.goalies||[])[0]===n) t.push("START"); else if(has(L.goalies)) t.push("BACKUP");
+  (L.pp||[]).forEach((u,i)=>{ if(has(u)) t.push("PP"+(i+1)); });
+  (L.pk||[]).forEach((u,i)=>{ if(has(u)) t.push("PK"+(i+1)); });
+  if(has(L.scratched)) t.push("SCRATCHED");
+  else if(has(L.notListed)) t.push("NOT ON LINEUP");
+  return t;
+}
+
 /* age on game day from a full M/D/YYYY date of birth; null for partial or missing dates */
 function ageOn(dob, iso){
   if(!dob || !iso) return null;
