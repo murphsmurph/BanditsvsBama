@@ -1,0 +1,69 @@
+/* ============================================================
+   LEARN THE ROSTER · FLASHCARDS · QUIZZES · BROADCAST MODE
+   (shared chrome — chip, modal, card — lives in app.css)
+   ============================================================ */
+.panel{max-width:1100px;margin:0 auto;}
+.toolbar{
+  display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+  background:#fff;border:1px solid var(--medium-gray);padding:8px;margin-bottom:12px;
+}
+.mastery{width:100%;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;}
+.bar{flex:1;height:10px;background:var(--medium-gray);border-radius:2px;overflow:hidden;}
+.bar i{display:block;height:100%;background:var(--bama-crimson);width:0;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+.tile{
+  background:#fff;border:1px solid var(--medium-gray);border-top:3px solid var(--bama-crimson);
+  padding:8px;cursor:pointer;text-align:left;font-family:var(--cond);
+}
+.tile:hover{border-color:var(--bama-crimson);}
+.tile .ph{
+  width:100%;aspect-ratio:1/1.15;background:var(--light-gray);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:6px;
+}
+.tile .ph img{width:100%;height:100%;object-fit:cover;}
+.tile .ph .sil{font-size:34px;font-weight:700;color:#c2c2c2;letter-spacing:-1px;}
+.tile .n{font-size:15px;font-weight:700;line-height:1.05;}
+.tile .n em{font-style:normal;color:var(--bama-crimson);}
+.tile .m{font-size:11px;color:var(--ink-soft);line-height:1.25;}
+.tile .dots{display:flex;gap:3px;margin-top:5px;}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--medium-gray);}
+.dot.on{background:var(--bama-crimson);}
+
+
+/* flashcards + quiz */
+.study{background:#fff;border:1px solid var(--medium-gray);padding:18px;text-align:center;max-width:520px;margin:0 auto;}
+.flash-num{font-size:76px;font-weight:700;line-height:1;color:var(--bama-crimson);}
+.flash-q{font-size:14px;letter-spacing:1px;color:var(--ink-soft);margin:6px 0 14px;}
+.flash-a{font-size:30px;font-weight:700;line-height:1.05;}
+.flash-a .m{font-size:14px;font-weight:400;color:var(--ink-soft);display:block;margin-top:4px;}
+.opts{display:grid;gap:8px;margin-top:14px;}
+.opt{
+  font-family:var(--cond);font-size:16px;font-weight:700;padding:12px;
+  border:1px solid #bbb;background:#fff;cursor:pointer;border-radius:2px;
+}
+.opt:hover{border-color:var(--bama-crimson);}
+.opt.right{background:#14532d;color:#fff;border-color:#14532d;}
+.opt.wrong{background:#7f1d1d;color:#fff;border-color:#7f1d1d;}
+.score{font-size:13px;color:var(--ink-soft);margin-top:12px;}
+
+/* broadcast mode */
+.bcast{background:#0d0d0d;color:#eee;min-height:100vh;padding:10px;}
+.bcast .row{
+  display:flex;gap:10px;align-items:center;padding:9px 8px;border-bottom:1px solid #262626;cursor:pointer;
+}
+.bcast .row:hover{background:#1a1a1a;}
+.bcast .bn{
+  min-width:44px;text-align:center;background:var(--bama-crimson);color:#fff;
+  font-size:22px;font-weight:700;padding:3px 0;
+}
+.bcast .bn.g{background:#333;}
+.bcast .bname{font-size:22px;font-weight:700;line-height:1;}
+.bcast .bmeta{font-size:12px;color:#9a9a9a;}
+.bcast .bnotes{display:none;padding:6px 8px 12px 62px;background:#141414;}
+.bcast .bnotes.open{display:block;}
+.bcast .bnotes li{font-size:14px;line-height:1.5;}
+.bcast input{
+  width:100%;padding:10px;font-size:18px;font-family:var(--cond);
+  background:#1a1a1a;color:#fff;border:1px solid #333;margin-bottom:8px;
+}
