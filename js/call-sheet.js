@@ -29,9 +29,12 @@ function renderCallSheet(){
     const first = p.sayFirst ? `${p.firstName} <span class="say">(${p.sayFirst})</span>` : p.firstName;
     /* goalies show their catching hand, skaters their shooting hand — never "Shoots" for a goalie */
     const hand = p.position==='G' ? (p.catches ? "Catches "+p.catches : null) : (p.shoots ? "Shoots "+p.shoots : null);
-    /* tonight's line / special-teams slots sit right after the position so they never get truncated */
+    /* quick-ID line: FIRST NAME (larger) · line / special-teams slots · height · class · hand.
+       The F/D letter is implied by F1 / D1 / 7D, so it only shows for goalies or when there are no line tags. */
     const tags = lineTags(p);
-    const strip = [p.position, tags.length ? `<span class="ln">${tags.join(" · ")}</span>` : null, first, p.height, p.classYear, hand]
+    const hasPosTag = tags.some(t=>/^(F\d|D\d|7D)$/.test(t));
+    const posLetter = (p.position==='G' || !hasPosTag) ? p.position : null;
+    const strip = [`<span class="fn">${first}</span>`, posLetter, tags.length ? `<span class="ln">${tags.join(" · ")}</span>` : null, p.height, p.classYear, hand]
       .filter(Boolean).join(" &nbsp;·&nbsp; ");
     const sub = [p.sayLast ? `<span class="say">${p.sayLast}</span>` : null, p.hometown, p.previousTeam]
       .filter(Boolean).join(" · ");

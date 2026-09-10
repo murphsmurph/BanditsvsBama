@@ -83,6 +83,7 @@
   font-size:calc(7.2px * var(--scale));letter-spacing:.3px;color:#333;text-transform:uppercase;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
+.strip .fn{font-size:1.35em;font-weight:700;color:#111;letter-spacing:.1px;}   /* first name leads, larger; em so the strip shrink applies to it too */
 .strip .say{text-transform:none;letter-spacing:0;}   /* keep stress caps as written: (nay-OH-mee) */
 .ln{color:var(--bama-crimson);font-weight:700;}      /* tonight's line / special-teams slots */
 .surname{
