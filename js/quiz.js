@@ -5,7 +5,7 @@
 let flashDeck=[], flashIdx=0, weakOnly=false;
 
 function buildDeck(){
-  const r = activeRoster();
+  const r = dressedRoster();   /* study only who is on the call sheet tonight */
   flashDeck = weakOnly
     ? r.filter(p=>{ const s=pState(p.number); return s.wrong>0 || !s.mastered; })
     : r.slice();
@@ -69,7 +69,7 @@ function sample(arr,n,not){
   return out;
 }
 function nextQuestion(){
-  const r = activeRoster();
+  const r = dressedRoster();
   const anyPhotos = r.some(p=>p.photo);
   if(quizMode==='photo' && !anyPhotos){
     $('#quizPrompt').textContent = "Photo quiz unlocks once headshots are added.";

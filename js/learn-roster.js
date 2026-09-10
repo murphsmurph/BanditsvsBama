@@ -21,7 +21,7 @@ function renderTeamCard(){
 }
 
 function renderGrid(){
-  const list = activeRoster().filter(p=>
+  const list = dressedRoster().filter(p=>
     (posFilter==='ALL'||p.position===posFilter) &&
     (clsFilter==='ALL'||p.classYear===clsFilter));
   $('#rosterGrid').innerHTML = list.map(p=>{
@@ -42,7 +42,7 @@ function renderGrid(){
 }
 
 function updateMastery(){
-  const r = activeRoster();
+  const r = dressedRoster();
   const pts = r.reduce((a,p)=>{
     const s = pState(p.number);
     return a + (s.seen?1:0) + (s.correct>=2?1:0) + (s.mastered?1:0);
