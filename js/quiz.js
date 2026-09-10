@@ -102,7 +102,10 @@ function answer(btn){
         $$('#quizOpts .opt').forEach(b=>{ if(+b.dataset.n===qAnswer.number) b.classList.add('right'); }); }
   s.seen=true; saveProgress(); updateMastery();
   $('#quizScore').textContent = `${qRight} / ${qTotal} correct`;
-  $$('#quizOpts .opt').forEach(b=>b.onclick=null);
-  setTimeout(nextQuestion, 850);
+  /* hold the green / red long enough to register — longer on a miss so the right answer sinks in.
+     Tap any option to move on early. */
+  const right = chosen===qAnswer.number;
+  const timer = setTimeout(nextQuestion, right ? 1500 : 2500);
+  $$('#quizOpts .opt').forEach(b=> b.onclick = ()=>{ clearTimeout(timer); nextQuestion(); });
 }
 
