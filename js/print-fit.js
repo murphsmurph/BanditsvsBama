@@ -1,30 +1,37 @@
 /* ============================================================
    PRINT FIT
-   The page is fixed at 8.14in × 10.64in and rows divide it evenly,
-   so the *page* can't overflow. What can overflow is the content
-   inside a row. This module:
-     1. measures the worst overflow across every cell,
+   Every call-sheet page is a fixed Letter box and rows divide it
+   evenly, so the *page* can't overflow. What can overflow is the
+   content inside a row. This module:
+     1. measures the worst overflow across every cell on every page,
      2. shrinks --scale in small steps until nothing overflows,
      3. shows PASS / FAIL in the top bar,
      4. lets you nudge text bigger or smaller (TEXT − / +) and
-        remembers the choice.
+        remembers the choice — separately for portrait and landscape.
    ============================================================ */
 const FIT = {
-  user: store.read('bamaTextScale', 1.2),   // your preference (120% fits 21 rows with room)
-  applied: 1.0,                              // what actually rendered
-  min: 0.70, max: 1.50, step: 0.05
+  user: 1.2, applied: 1.0, min: 0.70, max: 1.50, step: 0.05, def: 1.2, key: 'bamaTextScale',
+  /* per-layout preference: landscape rows are ~50% taller and 30% wider, so its default is bigger */
+  load(){
+    const land = typeof isLandscape === 'function' && isLandscape();
+    this.key = land ? 'bamaTextScaleLand' : 'bamaTextScale';
+    this.def = land ? 1.7 : 1.2;
+    this.max = land ? 2.4 : 1.5;
+    this.user = store.read(this.key, this.def);
+  }
 };
+FIT.load();
 
 function setScale(s){
-  $('#callSheet').style.setProperty('--scale', s);
+  $$('.call-sheet').forEach(pg=> pg.style.setProperty('--scale', s));
   FIT.applied = s;
 }
 
-/* worst overflow (px) anywhere on the sheet */
+/* worst overflow (px) anywhere on any call-sheet page */
 function measureOverflow(){
-  const page = $('#callSheet');
-  let over = page.scrollHeight - page.clientHeight;
-  $$('.player-row').forEach(row=>{
+  let over = 0;
+  $$('.call-sheet').forEach(page=>{ over = Math.max(over, page.scrollHeight - page.clientHeight); });
+  $$('.call-sheet .player-row').forEach(row=>{
     row.querySelectorAll('.id-cell, .notes-cell').forEach(cell=>{
       over = Math.max(over, cell.scrollHeight - cell.clientHeight);
     });
@@ -47,12 +54,13 @@ function autoFit(){
   reportFit(over, s);
 }
 
-/* page 2 has fixed text sizes; it can only overflow if content is added */
+/* team-sheet pages have fixed text sizes; they can only overflow if content is added */
 function teamOverflow(){
-  const ts = $('#teamSheet');
-  if(!ts) return 0;
-  let over = ts.scrollHeight - ts.clientHeight;
-  $$('#teamSheet .ts-col').forEach(c=>{ over = Math.max(over, c.scrollHeight - c.clientHeight); });
+  let over = 0;
+  $$('.team-sheet').forEach(ts=>{
+    over = Math.max(over, ts.scrollHeight - ts.clientHeight);
+    ts.querySelectorAll('.ts-col').forEach(c=>{ over = Math.max(over, c.scrollHeight - c.clientHeight); });
+  });
   return Math.max(0, over);
 }
 
@@ -79,12 +87,12 @@ function reportFit(over, s){
 /* ---- TEXT − / + ---- */
 function nudgeText(dir){
   FIT.user = +Math.min(FIT.max, Math.max(FIT.min, FIT.user + dir*FIT.step)).toFixed(2);
-  store.write('bamaTextScale', FIT.user);
+  store.write(FIT.key, FIT.user);
   autoFit();
 }
 $('#btnTextDown').onclick = ()=> nudgeText(-1);
 $('#btnTextUp').onclick   = ()=> nudgeText(+1);
-$('#btnTextReset').onclick= ()=> { FIT.user = 1.2; store.write('bamaTextScale', 1.2); autoFit(); };
+$('#btnTextReset').onclick= ()=> { FIT.user = FIT.def; store.write(FIT.key, FIT.def); autoFit(); };
 
 /* re-fit once web fonts land — condensed fonts are narrower than the fallback */
 if(document.fonts && document.fonts.ready){ document.fonts.ready.then(()=>{ autoFit(); }); }

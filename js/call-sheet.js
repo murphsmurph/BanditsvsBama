@@ -1,8 +1,30 @@
 /* ============================================================
-   CALL SHEET RENDER
-   Builds the printable page from ROSTER. print-fit.js decides
-   the final text scale after this runs.
+   CALL SHEET + TEAM SHEET RENDER
+   renderPages() builds every printed page from ROSTER / TEAM:
+     portrait  → 2 pages  (call sheet, team sheet)            [default]
+     landscape → 4 pages  (call sheet rows split in two, then the
+                           team sheet's info half and lineup half)
+   print-fit.js decides the final text scale after this runs.
    ============================================================ */
+const LAYOUT = { mode: store.read('bamaLayout', 'portrait') };
+const isLandscape = () => LAYOUT.mode === 'landscape';
+
+/* one printed page. Head / column header / footer are the same chrome on every page. */
+function pageShell({cls, id, headRight, colA, colB, foot, body}){
+  return `<div class="sheet-stage"><div class="print-page ${cls}${isLandscape()?' land':''}" id="${id}">
+    <div class="cs-head"><div class="l">ALABAMA WOMEN'S HOCKEY</div><div class="r">${headRight}</div></div>
+    <div class="cs-colhead"><div class="a">${colA}</div><div class="b">${colB}</div></div>
+    ${body}
+    <div class="cs-foot">${foot.map(f=>`<span>${f}</span>`).join("")}</div>
+  </div></div>`;
+}
+function headRight(prefix){
+  const G = TEAM.game; if(!G) return prefix || "";
+  const vs = `ALABAMA&nbsp;<em>vs</em>&nbsp;${G.opponent.replace(/^HSV /,"").toUpperCase()}`;
+  return `<span>${prefix?prefix+" &nbsp;·&nbsp; ":""}${vs} &nbsp;·&nbsp; ${G.date}${prefix?"":" &nbsp;·&nbsp; "+G.time}</span>` +
+    (G.counts===false ? `<small>${G.label}${prefix?"":" · SUPPORTING ALABAMA WOMEN'S HOCKEY"} · NON-COUNTING GAME</small>` : "");
+}
+const staffFoot = () => TEAM.staff.map(s=>`${s.role.replace("Head Coach","HC").replace("Assistant Coach","AC").replace("Head of Staff","HoS")} ${s.name}`).join(" &nbsp;·&nbsp; ");
 
 /* every candidate bullet is rendered; fitNotes() then hides trailing ones per row until the
    row fits at the current text size. The first MANDATORY bullets always stay (the generated
@@ -11,7 +33,7 @@ const MANDATORY_NOTES = 2;
 function pickNotes(p){ return noteCandidates(p); }
 
 function fitNotes(){
-  $$('#csRows .player-row').forEach(row=>{
+  $$('.call-sheet .player-row').forEach(row=>{
     const cell = row.querySelector('.notes-cell');
     const lis = [...cell.querySelectorAll('li')];
     lis.forEach(li=> li.hidden = false);
@@ -19,12 +41,7 @@ function fitNotes(){
   });
 }
 
-function renderCallSheet(){
-  const roster = dressedRoster();
-  const out = activeRoster().filter(offLineup);
-  const rows = $('#csRows');
-
-  rows.innerHTML = roster.map(p=>{
+function playerRow(p){
     /* first-name phonetic sits beside the first name; surname phonetic leads the subline under the surname */
     const first = p.sayFirst ? `${p.firstName} <span class="say">(${p.sayFirst})</span>` : p.firstName;
     /* goalies show their catching hand, skaters their shooting hand — never "Shoots" for a goalie */
@@ -50,17 +67,30 @@ function renderCallSheet(){
       </div>
       <div class="notes-cell"><ul>${notes}</ul></div>
     </div>`;
-  }).join("");
+}
 
+/* call-sheet pages: one in portrait, two (rows split evenly) in landscape */
+function callSheetPages(pageNo, total){
+  const roster = dressedRoster();
+  const out = activeRoster().filter(offLineup);
   const outTxt = out.length ? ` · NOT ON LINEUP: ${out.map(p=>p.number+" "+p.lastName.toUpperCase()).join(" · ")}` : "";
-  $('#footCount').textContent = roster.length + " DRESSED" + outTxt;
-  $('#rosterCount').textContent = `${roster.length} players on the sheet${out.length?` (${out.length} not on the coach's lineup are left off page 1 but stay in every other view)`:""}.`;
+  const chunks = isLandscape() ? [roster.slice(0, Math.ceil(roster.length/2)), roster.slice(Math.ceil(roster.length/2))] : [roster];
+  $('#rosterCount').textContent = `${roster.length} players on the sheet${out.length?` (${out.length} not on the coach's lineup are left off the call sheet but stay in every other view)`:""}.`;
+  return chunks.map((chunk,i)=> pageShell({
+    cls:"call-sheet", id:"callSheet"+(i?i+1:""),
+    headRight: headRight(""),
+    colA:"PLAYER / QUICK ID", colB:"BROADCAST NOTES",
+    foot:[`PAGE ${pageNo+i} OF ${total} · GAME-DAY VERIFY: numbers · scratches · positions · starting goalie`,
+          `HC ${TEAM.staff[0].name} &nbsp;·&nbsp; AC ${TEAM.staff[1].name}`,
+          `${roster.length} DRESSED${chunks.length>1?` · ${chunk[0].number}–${chunk[chunk.length-1].number} ON THIS PAGE`:""}${outTxt}`],
+    body:`<div class="cs-rows">${chunk.map(playerRow).join("")}</div>`
+  })).join("");
 }
 
 /* per-surname shrink so ZAHORCHAK / CABECEIRAS never wrap or clip.
    Max size follows --scale; min is a hard floor for legibility. */
 function fitAllNames(){
-  const scale = parseFloat(getComputedStyle($('#callSheet')).getPropertyValue('--scale')) || 1;
+  const scale = parseFloat(getComputedStyle($('.call-sheet')||document.body).getPropertyValue('--scale')) || 1;
   const shrink = (els, max, min, step) => els.forEach(el=>{
     let size = max;
     el.style.fontSize = size+"px";
@@ -79,7 +109,7 @@ function fitAllNames(){
    phonetics, lines grid, goalies, roster breakdown, game-day verify.
    Everything is TEAM data or computed from ROSTER; nothing typed in.
    ============================================================ */
-function renderTeamSheet(){
+function teamSheetPages(pageNo, total){
   const r = activeRoster();
   const sec  = (title, body) => `<div class="ts-sec"><h3>${title}</h3>${body}</div>`;
   const fill = title => `<div class="ts-sec fill"><h3>${title}</h3><div class="rule"></div></div>`;
@@ -258,38 +288,47 @@ function renderTeamSheet(){
     ["Home states", tallyStr(states) + (r.some(p=>!p.hometown) ? ` · ${r.filter(p=>!p.hometown).length} not listed` : "")]
   ]);
 
-  $('#tsBody').innerHTML = `
-    <div class="ts-col">
-      ${tonight ? sec("TONIGHT'S GAME", tonight) : ""}
-      ${sec("PROGRAM", program)}
-      ${sec("STAFF", staff)}
-      ${sec("HISTORY", history)}
-      ${sec("BY THE NUMBERS", byNumbers)}
-      ${sec("LEADERSHIP", ul(leaders))}
-      ${rosterNotes.length ? sec("ROSTER NOTES", ul(rosterNotes)) : ""}
-      ${fill("GAME NOTES")}
-    </div>
-    <div class="ts-col">
-      ${sec(L ? `LINES — ${L.source}` : "LINES — fill in at the rink", lines)}
-      ${special ? sec("POWER PLAY · PENALTY KILL", special) : ""}
-      ${sec("GOALIES", goalieRows)}
-      ${storylines.length ? sec("STORYLINES", ul(storylines)) : ""}
-      ${production ? sec("LINE PRODUCTION — Alabama career P · G by unit", production + pimLine) : ""}
-      ${sec("ROSTER BREAKDOWN", breakdown)}
-      ${fill("GAME NOTES · SCORING · PENALTIES")}
-    </div>`;
-  $('#tsFoot').innerHTML = TEAM.staff.map(s=>`${s.role.replace("Head Coach","HC").replace("Assistant Coach","AC").replace("Head of Staff","HoS")} ${s.name}`).join(" &nbsp;·&nbsp; ");
+  const S = {   /* every section, ready to place */
+    tonight: tonight ? sec("TONIGHT'S GAME", tonight) : "",
+    program: sec("PROGRAM", program), staff: sec("STAFF", staff), history: sec("HISTORY", history),
+    numbers: sec("BY THE NUMBERS", byNumbers), leadership: sec("LEADERSHIP", ul(leaders)),
+    notes: rosterNotes.length ? sec("ROSTER NOTES", ul(rosterNotes)) : "",
+    lines: sec(L ? `LINES — ${L.source}` : "LINES — fill in at the rink", lines),
+    special: special ? sec("POWER PLAY · PENALTY KILL", special) : "",
+    goalies: sec("GOALIES", goalieRows),
+    storylines: storylines.length ? sec("STORYLINES", ul(storylines)) : "",
+    production: production ? sec("LINE PRODUCTION — Alabama career P · G by unit", production + pimLine) : "",
+    breakdown: sec("ROSTER BREAKDOWN", breakdown)
+  };
+  const col = (...parts) => `<div class="ts-col">${parts.join("")}</div>`;
+  const body = (a,b) => `<div class="ts-body">${a}${b}</div>`;
+  const foot = (n, label) => [`PAGE ${n} OF ${total} · ${label}`, staffFoot(), "CHS = College Hockey South (conference)"];
+  if(!isLandscape()){
+    return pageShell({cls:"team-sheet", id:"teamSheet", headRight: headRight("TEAM SHEET"),
+      colA:"TONIGHT · PROGRAM · HISTORY · NUMBERS · ROSTER NOTES", colB:"LINES · PP · PK · GOALIES · STORYLINES · PRODUCTION · BREAKDOWN",
+      foot: foot(pageNo, "TEAM SHEET"),
+      body: body(col(S.tonight, S.program, S.staff, S.history, S.numbers, S.leadership, S.notes, fill("GAME NOTES")),
+                 col(S.lines, S.special, S.goalies, S.storylines, S.production, S.breakdown, fill("GAME NOTES · SCORING · PENALTIES")))});
+  }
+  return pageShell({cls:"team-sheet", id:"teamSheet", headRight: headRight("TEAM SHEET · PROGRAM"),
+      colA:"TONIGHT · PROGRAM · STAFF · HISTORY", colB:"BY THE NUMBERS · LEADERSHIP · ROSTER NOTES",
+      foot: foot(pageNo, "TEAM SHEET · PROGRAM"),
+      body: body(col(S.tonight, S.program, S.staff, S.history, fill("GAME NOTES")),
+                 col(S.numbers, S.leadership, S.notes, fill("GAME NOTES")))})
+   + pageShell({cls:"team-sheet", id:"teamSheet2", headRight: headRight("TEAM SHEET · LINEUP"),
+      colA:"LINES · PP · PK · GOALIES", colB:"STORYLINES · PRODUCTION · BREAKDOWN",
+      foot: foot(pageNo+1, "TEAM SHEET · LINEUP"),
+      body: body(col(S.lines, S.special, S.goalies, fill("GAME NOTES")),
+                 col(S.storylines, S.production, S.breakdown, fill("SCORING · PENALTIES")))});
 }
 
-/* both page headers come from TEAM.game; page 1 carries one short descriptor, page 2 the full story */
-function renderGameHeads(){
-  const G = TEAM.game; if(!G) return;
-  const vs = `ALABAMA&nbsp;<em>vs</em>&nbsp;${G.opponent.replace(/^HSV /,"").toUpperCase()}`;
-  $('#callSheet .cs-head .r').innerHTML =
-    `<span>${vs} &nbsp;·&nbsp; ${G.date} &nbsp;·&nbsp; ${G.time}</span>` +
-    (G.counts===false ? `<small>${G.label} · SUPPORTING ALABAMA WOMEN'S HOCKEY · NON-COUNTING GAME</small>` : "");
-  $('#teamSheet .cs-head .r').innerHTML = `<span>TEAM SHEET &nbsp;·&nbsp; ${vs} &nbsp;·&nbsp; ${G.date}</span>` +
-    (G.counts===false ? `<small>${G.label} · NON-COUNTING GAME</small>` : "");
+/* build every page for the current layout */
+function renderPages(){
+  const total = isLandscape() ? 4 : 2;
+  const callPages = isLandscape() ? 2 : 1;
+  $('#pages').innerHTML = callSheetPages(1, total) + teamSheetPages(callPages+1, total);
+  document.body.classList.toggle('landscape', isLandscape());
+  $('#btnLayout').textContent = isLandscape() ? "LAYOUT: 4 × LANDSCAPE" : "LAYOUT: 2 × PORTRAIT";
 }
 
 /* screen preview: scale each letter page down to fit the window, never distort it.
@@ -299,11 +338,12 @@ function scaleSheet(){
   $$('.sheet-stage').forEach(stage=>{
     const page = stage.firstElementChild;
     if(!stage.offsetWidth || !page) return;
+    const land = page.classList.contains('land');
+    const W = (land ? 10.64 : 8.14) * 96, H = (land ? 8.14 : 10.64) * 96;
     const avail = stage.offsetWidth - 8;
-    const natural = 8.14 * 96;
-    const scale = previewActual ? 1 : Math.min(1, avail / natural);
+    const scale = previewActual ? 1 : Math.min(1, avail / W);
     page.style.transform = `scale(${scale})`;
-    stage.style.height = (10.64 * 96 * scale + 20) + "px";
+    stage.style.height = (H * scale + 20) + "px";
   });
 }
 
@@ -313,6 +353,12 @@ $('#btnPreview').onclick = ()=>{
   document.body.classList.toggle('preview', previewActual);
   $('#btnPreview').textContent = previewActual ? "FIT TO WINDOW" : "PREVIEW 8.5 × 11";
   showView('sheet');
+  window.scrollTo({top:0, behavior:'smooth'});
+};
+$('#btnLayout').onclick = ()=>{
+  LAYOUT.mode = isLandscape() ? 'portrait' : 'landscape';
+  store.write('bamaLayout', LAYOUT.mode);
+  renderPages(); FIT.load(); showView('sheet');
   window.scrollTo({top:0, behavior:'smooth'});
 };
 window.addEventListener('resize', scaleSheet);

@@ -4,7 +4,7 @@ This is a play-by-play broadcaster's spot sheet for Alabama Women's Hockey. Util
 
 ## Non-negotiables
 
-1. **The call sheet prints on exactly one Letter portrait page, and the team sheet (page 2) on exactly one more.** After any change that touches `css/call-sheet.css`, `js/call-sheet.js`, `js/print-fit.js`, or the notes in `js/roster-data.js`, verify with the check below. Do not ship a change with `PRINT FIT: FAIL`.
+1. **The packet prints on exactly 2 Letter portrait pages (default) or exactly 4 Letter landscape pages (LAYOUT toggle, stored as `bamaLayout`).** `renderPages()` in `js/call-sheet.js` builds every page; landscape splits the call sheet rows in two and the team sheet into a program page and a lineup page, with bigger text (`--tsz` on `.team-sheet.land`, its own TEXT preference `bamaTextScaleLand`). After any change that touches `css/call-sheet.css`, `js/call-sheet.js`, `js/print-fit.js`, or the notes in `js/roster-data.js`, verify BOTH layouts with the check below. Do not ship a change with `PRINT FIT: FAIL` in either.
 2. **Never invent player data.** No made-up hometowns, heights, positions, previous teams, class years, pronunciations, or bio facts. Missing stays `null`. If two sources disagree, keep the official roster value and add a `dataQuality` entry: `{field, keep, alternate, alternateSource, note, print}`. `print:true` = game-call-important (position, hometown) and surfaces as a VERIFY line in Broadcast Mode; `print:false` = metadata (height) and shows only in Learn the Roster. Nothing from `dataQuality` prints on page 2 (the broadcaster dropped that section in favour of write-in space). Phonetics come only from the team spreadsheet's Last Phonetic / First Phonetic columns: `sayLast` is the surname, `sayFirst` the first name. Lines come only from the coaches: `TEAM.lines` holds Coach Edmiston's 9/11/26 sheet as written (trios and pairs are unlabeled on the sheet, so `columnsLabeled:false` and the order is preserved; `notListed` flags players absent from the sheet). Players in `scratched` or `notListed` are left off page 1 (`dressedRoster()`), named in the page-1 footer, and kept in every other view. Set `TEAM.lines` back to `null` and the grid prints blank write-in boxes with all 21 on page 1. `lineTags(p)` in app.js turns it into the F1 / D2 / PP1 / PK2 / START tags shown on page 1, Broadcast Mode and the study panel.
 3. **No nicknames anywhere.** The broadcaster does not want them.
 4. **No placeholder text for empty notes.** A player with no bio gets `notes: []` and a blank cell. Never write "no bio on file" or similar.
@@ -24,19 +24,22 @@ python3 - <<'EOF'
 from playwright.sync_api import sync_playwright
 import os, re
 with sync_playwright() as p:
-    b=p.chromium.launch(); pg=b.new_page(viewport={"width":1000,"height":1200})
-    pg.goto("file://"+os.path.abspath("index.html")); pg.wait_for_timeout(1000)
-    print(pg.text_content("#fitBadge"))
-    print("team sheet overflow px:", pg.evaluate("teamOverflow()"))
-    pg.emulate_media(media="print")
-    pg.pdf(path="/tmp/sheet.pdf", format="Letter", print_background=True,
-           margin={k:"0.18in" for k in ("top","bottom","left","right")}, prefer_css_page_size=True)
+    b=p.chromium.launch()
+    for mode in ("portrait","landscape"):
+        ctx=b.new_context(viewport={"width":1100,"height":1200}); pg=ctx.new_page()
+        pg.add_init_script(f"localStorage.setItem('bamaLayout', JSON.stringify('{mode}'))")
+        pg.goto("file://"+os.path.abspath("index.html")); pg.wait_for_timeout(1200)
+        print(mode, pg.text_content("#fitBadge"), "| team sheet overflow px:", pg.evaluate("teamOverflow()"))
+        pg.emulate_media(media="print")
+        pg.pdf(path=f"/tmp/{mode}.pdf", format="Letter", print_background=True,
+               margin={k:"0.18in" for k in ("top","bottom","left","right")}, prefer_css_page_size=True)
+        print("   pages:", len(re.findall(rb"/Type\s*/Page[^s]", open(f"/tmp/{mode}.pdf","rb").read())))
+        ctx.close()
     b.close()
-print("pages:", len(re.findall(rb"/Type\s*/Page[^s]", open("/tmp/sheet.pdf","rb").read())))
 EOF
 ```
 
-Expected: `PRINT FIT: PASS · text 120%`, `team sheet overflow px: 0`, and `pages: 2` (page 1 call sheet, page 2 team sheet). If Chromium is not where Playwright expects it, pass `executable_path="/opt/pw-browsers/chromium"` to `launch()`.
+Expected: portrait `PRINT FIT: PASS · text 120%`, overflow 0, `pages: 2`; landscape `PRINT FIT: PASS · text 170%`, overflow 0, `pages: 4`. If Chromium is not where Playwright expects it, pass `executable_path="/opt/pw-browsers/chromium"` to `launch()`.
 
 ## How sizing works
 

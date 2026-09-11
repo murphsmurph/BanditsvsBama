@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Alabama Women's Hockey — PBP Spot Sheet</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Archivo+Narrow:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/app.css?v=18">
-<link rel="stylesheet" href="css/call-sheet.css?v=18">
-<link rel="stylesheet" href="css/learn-roster.css?v=18">
+<link rel="stylesheet" href="css/app.css?v=19">
+<link rel="stylesheet" href="css/call-sheet.css?v=19">
+<link rel="stylesheet" href="css/learn-roster.css?v=19">
 </head>
 <body>
 
 <div class="topbar screen-only">
-  <h1>ALABAMA WOMEN'S HOCKEY <span>· PBP SPOT SHEET</span> <span class="ver" id="buildVer">build 18</span></h1>
+  <h1>ALABAMA WOMEN'S HOCKEY <span>· PBP SPOT SHEET</span> <span class="ver" id="buildVer">build 19</span></h1>
   <button class="tab active" data-view="sheet">CALL SHEET</button>
   <button class="tab" data-view="learn">LEARN THE ROSTER</button>
   <button class="tab" data-view="flash">FLASHCARDS</button>
@@ -27,6 +27,7 @@
     <button class="btn sm" id="btnTextReset" title="Reset to 120%">↺</button>
   </span>
   <span id="fitBadge" class="fit-badge fit-pass">PRINT FIT: —</span>
+  <button class="btn" id="btnLayout" title="Portrait: 2 pages. Landscape: 4 pages with bigger text, two per folder side">LAYOUT: 2 × PORTRAIT</button>
   <button class="btn" id="btnPreview">PREVIEW 8.5 × 11</button>
   <button class="btn primary" id="btnPrint">PRINT CALL SHEET</button>
 </div>
@@ -34,48 +35,12 @@
 <!-- ============ CALL SHEET ============ -->
 <section id="view-sheet" class="view active">
   <div class="note screen-only">
-    Sorted by sweater number. Text auto-shrinks until every row fits on one Letter page; use TEXT − / + to set your preferred size.
+    Sorted by sweater number. Text auto-shrinks until every row fits its page; use TEXT − / + to set your preferred size.
     <span id="rosterCount"></span>
-    Page 2 (team sheet) prints behind it.
+    LAYOUT switches between 2 portrait pages and 4 landscape pages (bigger text, two per folder side).
   </div>
-  <div class="sheet-stage">
-    <div class="print-page call-sheet" id="callSheet">
-      <div class="cs-head">
-        <div class="l">ALABAMA WOMEN'S HOCKEY</div>
-        <div class="r">ALABAMA&nbsp;<em>vs</em>&nbsp;BANDITS &nbsp;·&nbsp; FRI SEP 11, 2026 &nbsp;·&nbsp; 8:45 PM CT</div>
-      </div>
-      <div class="cs-colhead">
-        <div class="a">PLAYER / QUICK ID</div>
-        <div class="b">BROADCAST NOTES</div>
-      </div>
-      <div class="cs-rows" id="csRows"></div>
-      <div class="cs-foot">
-        <span>GAME-DAY VERIFY: numbers · scratches · positions · starting goalie</span>
-        <span>HC Jeffery Edmiston &nbsp;·&nbsp; AC Anya Laxton</span>
-        <span id="footCount"></span>
-      </div>
-    </div>
-  </div>
-
-  <!-- page 2: team sheet. Built by renderTeamSheet() from TEAM + ROSTER. -->
-  <div class="sheet-stage">
-    <div class="print-page team-sheet" id="teamSheet">
-      <div class="cs-head">
-        <div class="l">ALABAMA WOMEN'S HOCKEY</div>
-        <div class="r">TEAM SHEET &nbsp;·&nbsp; ALABAMA&nbsp;<em>vs</em>&nbsp;BANDITS &nbsp;·&nbsp; FRI SEP 11, 2026</div>
-      </div>
-      <div class="cs-colhead">
-        <div class="a">TONIGHT · PROGRAM · HISTORY · NUMBERS · ROSTER NOTES</div>
-        <div class="b">LINES · PP · PK · GOALIES · STORYLINES · PRODUCTION · BREAKDOWN</div>
-      </div>
-      <div class="ts-body" id="tsBody"></div>
-      <div class="cs-foot">
-        <span>PAGE 2 OF 2 · TEAM SHEET</span>
-        <span id="tsFoot"></span>
-        <span>CHS = College Hockey South (conference)</span>
-      </div>
-    </div>
-  </div>
+  <!-- every printed page is built here by renderPages() from TEAM + ROSTER — no player data in this file -->
+  <div id="pages"></div>
 </section>
 
 <!-- ============ LEARN THE ROSTER ============ -->
@@ -167,13 +132,13 @@
 </div>
 
 <!-- plain scripts, no modules: works from file:// and GitHub Pages alike -->
-<script src="js/roster-data.js?v=18"></script>
-<script src="js/app.js?v=18"></script>
-<script src="js/call-sheet.js?v=18"></script>
-<script src="js/print-fit.js?v=18"></script>
-<script src="js/learn-roster.js?v=18"></script>
-<script src="js/quiz.js?v=18"></script>
-<script src="js/broadcast.js?v=18"></script>
-<script src="js/main.js?v=18"></script>
+<script src="js/roster-data.js?v=19"></script>
+<script src="js/app.js?v=19"></script>
+<script src="js/call-sheet.js?v=19"></script>
+<script src="js/print-fit.js?v=19"></script>
+<script src="js/learn-roster.js?v=19"></script>
+<script src="js/quiz.js?v=19"></script>
+<script src="js/broadcast.js?v=19"></script>
+<script src="js/main.js?v=19"></script>
 </body>
 </html>
