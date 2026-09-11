@@ -333,15 +333,14 @@ function teamSheetPages(pageNo, total){
    splits the roster in two and gives notes a page of their own.
    ============================================================ */
 function banditRow(b){
+  /* names only — positions and line slots are left off the print because they can change before puck drop */
   const last = b.lastName || b.firstName;
   const first = b.lastName ? b.firstName : "";
-  const slot = oppLineTag(b.id);
-  const strip = [first ? `<span class="fn">${first}</span>` : null, slot ? `<span class="ln">${slot}</span>` : null, b.position].filter(Boolean).join(" &nbsp;·&nbsp; ");
   return `<div class="player-row">
     <div class="id-cell">
-      <div class="num-block blank${b.position==='G'?' goalie':''}"></div>
+      <div class="num-block blank"></div>
       <div class="id-text">
-        <div class="strip">${strip}</div>
+        <div class="strip">${first ? `<span class="fn">${first}</span>` : "&nbsp;"}</div>
         <div class="surname" data-fit>${last.toUpperCase()}</div>
         <div class="subline">${b.note || "&nbsp;"}</div>
       </div>
@@ -349,30 +348,40 @@ function banditRow(b){
     <div class="notes-cell rule"></div>
   </div>`;
 }
+/* extra rows to write a late addition in at the rink */
+const blankBanditRow = () => `<div class="player-row">
+    <div class="id-cell">
+      <div class="num-block blank"></div>
+      <div class="id-text"><div class="strip">&nbsp;</div><div class="surname write">&nbsp;</div><div class="subline">&nbsp;</div></div>
+    </div>
+    <div class="notes-cell rule"></div>
+  </div>`;
 function banditsPages(){
   const O = typeof OPPONENT !== "undefined" ? OPPONENT : null; if(!O) return "";
-  const order = {F:0, D:1, G:2};
-  const key = b => { const t = oppLineTag(b.id); const m = t && /^([FD])(\d) (LW|C|RW|LD|RD)$/.exec(t);
-    return [order[b.position], m ? +m[2] : 9, m ? ["LW","C","RW","LD","RD"].indexOf(m[3]) : 9, (b.lastName||b.firstName)]; };
-  const roster = [...O.roster].sort((a,b)=>{ const ka=key(a), kb=key(b); for(let i=0;i<3;i++){ if(ka[i]!==kb[i]) return ka[i]-kb[i]; } return ka[3].localeCompare(kb[3]); });
+  const roster = [...O.roster].sort((a,b)=>(a.lastName||a.firstName).localeCompare(b.lastName||b.firstName));
+  const rows = [...roster.map(banditRow), ...Array.from({length: O.blankRows||0}, blankBanditRow)];
   const land = isLandscape(), total = land ? 4 : 2;
-  const chunks = land ? [roster.slice(0, Math.ceil(roster.length/2)), roster.slice(Math.ceil(roster.length/2))] : [roster];
+  const chunks = land ? [rows.slice(0, Math.ceil(rows.length/2)), rows.slice(Math.ceil(rows.length/2))] : [rows];
+  const nameAt = i => { const b = roster[Math.min(i, roster.length-1)]; return (b.lastName||b.firstName).toUpperCase(); };
   const head = prefix => `<span>${prefix?prefix+" &nbsp;·&nbsp; ":""}${O.name.toUpperCase()}&nbsp;<em>at</em>&nbsp;ALABAMA &nbsp;·&nbsp; ${TEAM.game.date}${prefix?"":" &nbsp;·&nbsp; "+TEAM.game.time}</span><small>${O.note.toUpperCase()} · ${TEAM.game.label} · FILL IN NUMBERS AT THE RINK</small>`;
-  const foot = (n, label) => [`PAGE ${n} OF ${total} · ${label}`, `Source: ${O.source}`, `${roster.length} NAMES · NO NUMBERS OR STATS SUPPLIED`];
-  const pages = chunks.map((chunk,i)=> pageShell({cls:"call-sheet opp", id:"oppSheet"+(i?i+1:""), headLeft: O.name.toUpperCase(), headRight: head(""),
+  const foot = (n, label) => [`PAGE ${n} OF ${total} · ${label}`, `Source: ${O.source}`, `${roster.length} NAMES + ${O.blankRows||0} BLANK · NO NUMBERS OR STATS SUPPLIED · POSITIONS / LINES: FILL IN AT THE RINK`];
+  let off = 0;
+  const pages = chunks.map((chunk,i)=>{ const first = off, last = off + chunk.length - 1; off += chunk.length;
+    return pageShell({cls:"call-sheet opp", id:"oppSheet"+(i?i+1:""), headLeft: O.name.toUpperCase(), headRight: head(""),
     colA:"# (WRITE IN) / PLAYER", colB:"NOTES",
-    foot: foot(1+i, "BANDITS ROSTER" + (chunks.length>1 ? ` · ${(chunk[0].lastName||chunk[0].firstName).toUpperCase()}–${(chunk[chunk.length-1].lastName||chunk[chunk.length-1].firstName).toUpperCase()}` : "")),
-    body:`<div class="cs-rows">${chunk.map(banditRow).join("")}</div>`}));
+    foot: foot(1+i, "BANDITS ROSTER" + (chunks.length>1 ? ` · ${nameAt(first)}–${last < roster.length ? nameAt(last) : "BLANK"}` : "")),
+    body:`<div class="cs-rows">${chunk.join("")}</div>`}); });
   const name = id => { const b = O.roster.find(x=>x.id===id); return b && (b.lastName ? `<b>${b.lastName.toUpperCase()}</b> ${b.firstName}` : `<b>${b.firstName.toUpperCase()}</b>`); };
   const sec = (t, body) => `<div class="ts-sec"><h3>${t}</h3>${body}</div>`;
   const fill = t => `<div class="ts-sec fill"><h3>${t}</h3><div class="rule"></div></div>`;
   const col = (...parts) => `<div class="ts-col">${parts.join("")}</div>`;
-  const grid = linesGrid(O.lines, name, {blankRows:["PP1","PP2","PK1","PK2"]});
-  const goalies = `<div class="lines"><div class="line"><div class="lbl">START</div><div class="slot">${(O.lines.goalies[0] && name(O.lines.goalies[0])) || "&nbsp;"}</div><div class="slot">&nbsp;</div></div>
-    <div class="line"><div class="lbl">BACKUP</div><div class="slot">${(O.lines.goalies[1] && name(O.lines.goalies[1])) || "&nbsp;"}</div><div class="slot">&nbsp;</div></div></div>`;
+  /* lines can change before the game — the grid prints blank to write in at the rink (their app's lines stay in Broadcast Mode) */
+  const grid = linesGrid(null, name, {blankRows:["PP1","PP2","PK1","PK2"]});
+  const goalies = `<div class="lines"><div class="line"><div class="lbl">START</div><div class="slot">&nbsp;</div><div class="slot">&nbsp;</div></div>
+    <div class="line"><div class="lbl">BACKUP</div><div class="slot">&nbsp;</div><div class="slot">&nbsp;</div></div></div>`;
   const linesPage = n => pageShell({cls:"team-sheet opp", id:"oppTeam", headLeft: O.name.toUpperCase(), headRight: head("LINES"),
     colA:"LINES · PP · PK · GOALIES", colB:"GAME NOTES · SCORING · PENALTIES", foot: foot(n, "BANDITS LINES"),
-    body:`<div class="ts-body">${col(sec(`LINES — from the Bandits lines app`, grid), sec("GOALIES", goalies), fill("GAME NOTES"))}${col(fill("GAME NOTES · SCORING · PENALTIES"))}</div>`});
+    body:`<div class="ts-body">${col(sec(`LINES — fill in at the rink`, grid), sec("GOALIES", goalies), fill("GAME NOTES"))}${col(fill("GAME NOTES · SCORING · PENALTIES"))}</div>`});
   const notesPage = n => pageShell({cls:"team-sheet opp", id:"oppNotes", headLeft: O.name.toUpperCase(), headRight: head("NOTES"),
     colA:"GAME NOTES", colB:"SCORING · PENALTIES", foot: foot(n, "BANDITS NOTES"),
     body:`<div class="ts-body">${col(fill("GAME NOTES"))}${col(fill("SCORING · PENALTIES"))}</div>`});

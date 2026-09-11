@@ -40,6 +40,7 @@
 .opp .ts-body{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}   /* lines page: names need the room, notes get the rest */
 .opp .num-block.blank{background:#fff;border:1.5px solid var(--opp);color:var(--opp);}
 .opp .num-block.blank.goalie{border-color:#111;}
+.opp .surname.write{border-bottom:1px solid #999;margin-right:8px;}   /* write-in name line on blank rows */
 .opp .notes-cell.rule{
   background:repeating-linear-gradient(to bottom, transparent 0 .24in, #cfcfcf .24in calc(.24in + .75px));
   background-origin:content-box;background-clip:content-box;

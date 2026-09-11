@@ -529,6 +529,7 @@ const TEAM = {
 const OPPONENT = {
   name:"HSV Bandits", shortName:"Bandits", note:"men's beer-league team",
   source:"Bandits lines app screenshots supplied by broadcaster",
+  blankRows:2,   /* extra empty roster rows on the printed sheet for late additions */
   roster:[
     {id:"harber",   firstName:"Nate",     lastName:"Harber",   position:"F", number:null, note:null},
     {id:"joey",     firstName:"Awesome Joey", lastName:null,   position:"F", number:null, note:null},
