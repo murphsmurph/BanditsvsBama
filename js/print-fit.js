@@ -23,7 +23,7 @@ const FIT = {
 FIT.load();
 
 function setScale(s){
-  $$('.call-sheet').forEach(pg=> pg.style.setProperty('--scale', s));
+  $$('.call-sheet:not(.opp)').forEach(pg=> pg.style.setProperty('--scale', s));   /* Bandits pages keep their CSS-pinned scale */
   FIT.applied = s;
 }
 

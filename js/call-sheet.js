@@ -90,7 +90,7 @@ function callSheetPages(pageNo, total){
 /* per-surname shrink so ZAHORCHAK / CABECEIRAS never wrap or clip.
    Max size follows --scale; min is a hard floor for legibility. */
 function fitAllNames(){
-  const scale = parseFloat(getComputedStyle($('.call-sheet')||document.body).getPropertyValue('--scale')) || 1;
+  const scale = parseFloat(getComputedStyle($('.view.active .call-sheet')||$('.call-sheet')||document.body).getPropertyValue('--scale')) || 1;
   const shrink = (els, max, min, step) => els.forEach(el=>{
     let size = max;
     el.style.fontSize = size+"px";

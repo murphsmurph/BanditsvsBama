@@ -31,6 +31,7 @@
 
 /* ---- Bandits packet theme: dark green accents, blank number boxes, ruled notes ---- */
 .opp{--opp:#1f4d2b;}
+.call-sheet.opp{--scale:1.3;--hscale:1.2;}   /* Bandits sheet is pinned: same size in both layouts, header never clips */
 .opp .cs-head{border-bottom-color:var(--opp);}
 .opp .cs-head .l{background:var(--opp);}
 .opp .cs-head .r em,.opp .cs-head .r small,.opp .strip .ln,.opp .ts-sec li::marker{color:var(--opp);}
