@@ -5,19 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Alabama Women's Hockey — PBP Spot Sheet</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Archivo+Narrow:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/app.css?v=19">
-<link rel="stylesheet" href="css/call-sheet.css?v=19">
-<link rel="stylesheet" href="css/learn-roster.css?v=19">
+<link rel="stylesheet" href="css/app.css?v=20">
+<link rel="stylesheet" href="css/call-sheet.css?v=20">
+<link rel="stylesheet" href="css/learn-roster.css?v=20">
 </head>
 <body>
 
 <div class="topbar screen-only">
-  <h1>ALABAMA WOMEN'S HOCKEY <span>· PBP SPOT SHEET</span> <span class="ver" id="buildVer">build 19</span></h1>
+  <h1>ALABAMA WOMEN'S HOCKEY <span>· PBP SPOT SHEET</span> <span class="ver" id="buildVer">build 20</span></h1>
   <button class="tab active" data-view="sheet">CALL SHEET</button>
   <button class="tab" data-view="learn">LEARN THE ROSTER</button>
   <button class="tab" data-view="flash">FLASHCARDS</button>
   <button class="tab" data-view="quiz">QUIZZES</button>
   <button class="tab" data-view="bcast">BROADCAST MODE</button>
+  <button class="tab" data-view="bandits">BANDITS SHEET</button>
   <span class="spacer"></span>
   <span class="textsize">
     <span>TEXT</span>
@@ -41,6 +42,16 @@
   </div>
   <!-- every printed page is built here by renderPages() from TEAM + ROSTER — no player data in this file -->
   <div id="pages"></div>
+</section>
+
+<!-- ============ BANDITS SHEET ============ -->
+<section id="view-bandits" class="view">
+  <div class="note screen-only">
+    Bandits packet: names and line slots from their lines app, blank number boxes and ruled notes to fill in at the rink.
+    Follows the LAYOUT toggle (2 portrait or 4 landscape pages). PRINT from this tab prints only this packet.
+  </div>
+  <!-- built by banditsPages() from OPPONENT — no player data in this file -->
+  <div id="oppPages"></div>
 </section>
 
 <!-- ============ LEARN THE ROSTER ============ -->
@@ -132,13 +143,13 @@
 </div>
 
 <!-- plain scripts, no modules: works from file:// and GitHub Pages alike -->
-<script src="js/roster-data.js?v=19"></script>
-<script src="js/app.js?v=19"></script>
-<script src="js/call-sheet.js?v=19"></script>
-<script src="js/print-fit.js?v=19"></script>
-<script src="js/learn-roster.js?v=19"></script>
-<script src="js/quiz.js?v=19"></script>
-<script src="js/broadcast.js?v=19"></script>
-<script src="js/main.js?v=19"></script>
+<script src="js/roster-data.js?v=20"></script>
+<script src="js/app.js?v=20"></script>
+<script src="js/call-sheet.js?v=20"></script>
+<script src="js/print-fit.js?v=20"></script>
+<script src="js/learn-roster.js?v=20"></script>
+<script src="js/quiz.js?v=20"></script>
+<script src="js/broadcast.js?v=20"></script>
+<script src="js/main.js?v=20"></script>
 </body>
 </html>

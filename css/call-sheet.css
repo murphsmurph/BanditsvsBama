@@ -29,6 +29,22 @@
 .land .cs-foot{height:.18in;font-size:8px;}
 .sheet-stage + .sheet-stage{margin-top:14px;}
 
+/* ---- Bandits packet theme: dark green accents, blank number boxes, ruled notes ---- */
+.opp{--opp:#1f4d2b;}
+.opp .cs-head{border-bottom-color:var(--opp);}
+.opp .cs-head .l{background:var(--opp);}
+.opp .cs-head .r em,.opp .cs-head .r small,.opp .strip .ln,.opp .ts-sec li::marker{color:var(--opp);}
+.opp .cs-foot{border-top-color:var(--opp);}
+.opp .id-cell{border-right-color:var(--opp);}
+.opp .ts-col:first-child{border-right-color:var(--opp);}
+.opp .ts-body{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}   /* lines page: names need the room, notes get the rest */
+.opp .num-block.blank{background:#fff;border:1.5px solid var(--opp);color:var(--opp);}
+.opp .num-block.blank.goalie{border-color:#111;}
+.opp .notes-cell.rule{
+  background:repeating-linear-gradient(to bottom, transparent 0 .24in, #cfcfcf .24in calc(.24in + .75px));
+  background-origin:content-box;background-clip:content-box;
+}
+
 /* header / column header / footer are fixed-height */
 .cs-head{
   display:flex;align-items:stretch;flex:0 0 auto;
@@ -166,6 +182,7 @@
 .line .lbl{flex:0 0 .5in;font-size:calc(9px * var(--tsz));font-weight:700;letter-spacing:.5px;display:flex;align-items:center;color:#333;}
 .line .slot{
   flex:1 1 0;min-width:0;min-height:calc(.27in * var(--tsz));border:.75px solid #999;padding:1px 5px;
+  gap:3px;
   font-size:calc(10.5px * var(--tsz));display:flex;align-items:center;background:#fff;white-space:nowrap;overflow:hidden;
 }
 .line .slot.blank{border:none;background:transparent;}
@@ -189,9 +206,9 @@
 .print-page.land{page:land;}
 @media print{
   body{background:#fff;}
-  .topbar,.toolbar,.screen-only,.note,
-  #view-learn,#view-flash,#view-quiz,#view-bcast,.modal{display:none !important;}
-  #view-sheet{display:block !important;padding:0 !important;}
+  .topbar,.toolbar,.screen-only,.note,.modal,
+  .view:not(.active){display:none !important;}       /* print whichever packet tab is open */
+  .view.active{display:block !important;padding:0 !important;}
   .sheet-stage{display:block !important;height:auto !important;margin:0 !important;}   /* no screen gap in print — it would spill each page */
   .print-page{
     display:flex !important;transform:none !important;

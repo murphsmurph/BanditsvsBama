@@ -119,6 +119,16 @@ function lineTags(p){
 const offLineup = p => { const L = TEAM.lines; return !!L && ((L.scratched||[]).includes(p.number) || (L.notListed||[]).includes(p.number)); };
 const dressedRoster = () => activeRoster().filter(p=>!offLineup(p));
 
+/* Bandits: which line slot an OPPONENT id holds, e.g. "F1 LW", "D2 RD", "G" */
+function oppLineTag(id){
+  const O = typeof OPPONENT !== "undefined" ? OPPONENT : null; if(!O || !O.lines) return null;
+  const F = ["LW","C","RW"], D = ["LD","RD"];
+  for(let i=0;i<(O.lines.forwards||[]).length;i++){ const j=O.lines.forwards[i].indexOf(id); if(j>=0) return `F${i+1} ${F[j]}`; }
+  for(let i=0;i<(O.lines.defense||[]).length;i++){ const j=O.lines.defense[i].indexOf(id); if(j>=0) return `D${i+1} ${D[j]}`; }
+  const g=(O.lines.goalies||[]).indexOf(id); if(g>=0) return g===0?"G":"G2";
+  return null;
+}
+
 /* age on game day from a full M/D/YYYY date of birth; null for partial or missing dates */
 function ageOn(dob, iso){
   if(!dob || !iso) return null;
@@ -205,7 +215,7 @@ function showView(v){
   $$('.view').forEach(s=>s.classList.remove('active'));
   $('#view-'+v).classList.add('active');
   $$('.tab').forEach(t=>t.classList.toggle('active', t.dataset.view===v));
-  if(v==='sheet'){ scaleSheet(); autoFit(); }
+  if(v==='sheet' || v==='bandits'){ scaleSheet(); autoFit(); }
   if(v==='flash') renderFlash();
   if(v==='quiz') nextQuestion();
 }

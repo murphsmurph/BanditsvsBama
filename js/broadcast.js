@@ -16,14 +16,7 @@ function renderBcast(filter=""){
     </div>` : "";
   /* opponent rows: names and line slots only — no numbers or stats were supplied */
   const O = typeof OPPONENT !== "undefined" ? OPPONENT : null;
-  const oppSlot = id => {
-    if(!O || !O.lines) return null;
-    const F = ["LW","C","RW"], D = ["LD","RD"];
-    for(let i=0;i<(O.lines.forwards||[]).length;i++){ const j=O.lines.forwards[i].indexOf(id); if(j>=0) return `F${i+1} ${F[j]}`; }
-    for(let i=0;i<(O.lines.defense||[]).length;i++){ const j=O.lines.defense[i].indexOf(id); if(j>=0) return `D${i+1} ${D[j]}`; }
-    const g=(O.lines.goalies||[]).indexOf(id); if(g>=0) return g===0?"G":"G2";
-    return null;
-  };
+  const oppSlot = oppLineTag;
   const opp = O ? O.roster.filter(b=> !f || (b.lastName||"").toLowerCase().includes(f) || b.firstName.toLowerCase().includes(f) || O.shortName.toLowerCase().includes(f)) : [];
   const oppHtml = opp.length ? `<div class="bdiv">${O.name.toUpperCase()} — ${O.note} · no numbers or stats supplied</div>` + opp.map(b=>`
     <div class="row opp">

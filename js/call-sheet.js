@@ -10,9 +10,9 @@ const LAYOUT = { mode: store.read('bamaLayout', 'portrait') };
 const isLandscape = () => LAYOUT.mode === 'landscape';
 
 /* one printed page. Head / column header / footer are the same chrome on every page. */
-function pageShell({cls, id, headRight, colA, colB, foot, body}){
+function pageShell({cls, id, headLeft="ALABAMA WOMEN'S HOCKEY", headRight, colA, colB, foot, body}){
   return `<div class="sheet-stage"><div class="print-page ${cls}${isLandscape()?' land':''}" id="${id}">
-    <div class="cs-head"><div class="l">ALABAMA WOMEN'S HOCKEY</div><div class="r">${headRight}</div></div>
+    <div class="cs-head"><div class="l">${headLeft}</div><div class="r">${headRight}</div></div>
     <div class="cs-colhead"><div class="a">${colA}</div><div class="b">${colB}</div></div>
     ${body}
     <div class="cs-foot">${foot.map(f=>`<span>${f}</span>`).join("")}</div>
@@ -33,7 +33,7 @@ const MANDATORY_NOTES = 2;
 function pickNotes(p){ return noteCandidates(p); }
 
 function fitNotes(){
-  $$('.call-sheet .player-row').forEach(row=>{
+  $$('.view.active .call-sheet .player-row').forEach(row=>{
     const cell = row.querySelector('.notes-cell');
     const lis = [...cell.querySelectorAll('li')];
     lis.forEach(li=> li.hidden = false);
@@ -99,9 +99,34 @@ function fitAllNames(){
       el.style.fontSize = size+"px";
     }
   });
-  shrink($$('.surname[data-fit]'), 16 * scale, 9.5, 0.5);
+  shrink($$('.view.active .surname[data-fit]'), 16 * scale, 9.5, 0.5);
   /* the quick-ID strip (position · line tags · first name · height · class · hand) shrinks a little rather than truncating */
-  shrink($$('.strip'), 7.2 * scale, 6, 0.2);
+  shrink($$('.view.active .strip'), 7.2 * scale, 6, 0.2);
+}
+
+
+/* one lines-grid renderer for both teams: `resolve(key)` turns a line-chart key into a name, or
+   falsy for an empty slot. Alabama keys are sweater numbers; Bandits keys are OPPONENT ids.
+   filled = lines exist (compact, typed); blank = write-in boxes. blankRows adds wide write-in rows. */
+const lineRow = (lbl, cells) => `<div class="line"><div class="lbl">${lbl}</div>${cells}</div>`;
+const lineHdr = cols => `<div class="line hdr"><div class="lbl"></div>${cols.map(c=>`<div class="slot">${c}</div>`).join("")}</div>`;
+const lineAt = (L, group, i, j) => L && L[group] && L[group][i] ? L[group][i][j] : null;
+function linesGrid(L, resolve, {blankRows=null}={}){
+  const filled = !!(L && L.forwards);
+  const labeled = !L || L.columnsLabeled !== false;
+  const slot = (key, cls="") => `<div class="slot ${cls}">${(key!=null && resolve(key)) || "&nbsp;"}</div>`;
+  const extra = filled && L.extraDefense && L.extraDefense.length
+    ? lineRow("7D", L.extraDefense.map(k=>slot(k)).join("") + `<div class="slot blank"></div>`.repeat(Math.max(0, 3-L.extraDefense.length))) : "";
+  const blanks = blankRows || (filled ? [] : ["PP1","PK1"]);
+  return `<div class="lines${filled?" sm":""}">
+    ${lineHdr(labeled ? ["LW","C","RW"] : ["","",""])}
+    ${[0,1,2,3].map(i=> lineRow("F"+(i+1), [0,1,2].map(j=> slot(lineAt(L,'forwards',i,j))).join(""))).join("")}
+    ${lineHdr(labeled ? ["LD","RD","G"] : ["","","G"])}
+    ${[0,1,2].map(i=> lineRow("D"+(i+1), [0,1].map(j=> slot(lineAt(L,'defense',i,j))).join("") +
+        (i<2 ? slot(L && L.goalies ? L.goalies[i] : null) : `<div class="slot blank"></div>`))).join("")}
+    ${extra}
+    ${blanks.map(l=> lineRow(l, `<div class="slot wide">&nbsp;</div>`)).join("")}
+  </div>`;
 }
 
 /* ============================================================
@@ -183,28 +208,6 @@ function teamSheetPages(pageNo, total){
     .map(p=>`${tag(p)} — ${p.leadership.join(" · ")}`);
 
   /* ---- right column ---- */
-  /* one lines-grid renderer for both teams: `resolve(key)` turns a line-chart key into a name, or
-     falsy for an empty slot. Alabama keys are sweater numbers; Bandits keys are OPPONENT ids. */
-  const lineRow = (lbl, cells) => `<div class="line"><div class="lbl">${lbl}</div>${cells}</div>`;
-  const hdr = cols => `<div class="line hdr"><div class="lbl"></div>${cols.map(c=>`<div class="slot">${c}</div>`).join("")}</div>`;
-  const at = (L, group, i, j) => L && L[group] && L[group][i] ? L[group][i][j] : null;
-  /* filled = lines exist (compact, typed); blank = write-in boxes. Column labels only when the source labels them. */
-  const linesGrid = (L, resolve) => {
-    const filled = !!(L && L.forwards);
-    const labeled = !L || L.columnsLabeled !== false;
-    const slot = (key, cls="") => `<div class="slot ${cls}">${(key!=null && resolve(key)) || "&nbsp;"}</div>`;
-    const extra = filled && L.extraDefense && L.extraDefense.length
-      ? lineRow("7D", L.extraDefense.map(k=>slot(k)).join("") + `<div class="slot blank"></div>`.repeat(Math.max(0, 3-L.extraDefense.length))) : "";
-    return `<div class="lines${filled?" sm":""}">
-      ${hdr(labeled ? ["LW","C","RW"] : ["","",""])}
-      ${[0,1,2,3].map(i=> lineRow("F"+(i+1), [0,1,2].map(j=> slot(at(L,'forwards',i,j))).join(""))).join("")}
-      ${hdr(labeled ? ["LD","RD","G"] : ["","","G"])}
-      ${[0,1,2].map(i=> lineRow("D"+(i+1), [0,1].map(j=> slot(at(L,'defense',i,j))).join("") +
-          (i<2 ? slot(L && L.goalies ? L.goalies[i] : null) : `<div class="slot blank"></div>`))).join("")}
-      ${extra}
-      ${filled ? "" : ["PP1","PK1"].map(l=> lineRow(l, `<div class="slot wide">&nbsp;</div>`)).join("")}
-    </div>`;
-  };
   const L = TEAM.lines || null;
   const byNum = n => r.find(p=>p.number===n);
   const alaName = n => { const p = byNum(n); return p && tag(p); };
@@ -322,11 +325,66 @@ function teamSheetPages(pageNo, total){
                  col(S.storylines, S.production, S.breakdown, fill("SCORING · PENALTIES")))});
 }
 
+/* ============================================================
+   BANDITS PACKET — names only (no numbers or stats were supplied).
+   Page 1: roster rows with a blank number box, first + last name,
+   line slot from the Bandits app, ruled notes. Page 2: their lines
+   grid with blank PP / PK write-ins, plus ruled notes. Landscape
+   splits the roster in two and gives notes a page of their own.
+   ============================================================ */
+function banditRow(b){
+  const last = b.lastName || b.firstName;
+  const first = b.lastName ? b.firstName : "";
+  const slot = oppLineTag(b.id);
+  const strip = [first ? `<span class="fn">${first}</span>` : null, slot ? `<span class="ln">${slot}</span>` : null, b.position].filter(Boolean).join(" &nbsp;·&nbsp; ");
+  return `<div class="player-row">
+    <div class="id-cell">
+      <div class="num-block blank${b.position==='G'?' goalie':''}"></div>
+      <div class="id-text">
+        <div class="strip">${strip}</div>
+        <div class="surname" data-fit>${last.toUpperCase()}</div>
+        <div class="subline">${b.note || "&nbsp;"}</div>
+      </div>
+    </div>
+    <div class="notes-cell rule"></div>
+  </div>`;
+}
+function banditsPages(){
+  const O = typeof OPPONENT !== "undefined" ? OPPONENT : null; if(!O) return "";
+  const order = {F:0, D:1, G:2};
+  const key = b => { const t = oppLineTag(b.id); const m = t && /^([FD])(\d) (LW|C|RW|LD|RD)$/.exec(t);
+    return [order[b.position], m ? +m[2] : 9, m ? ["LW","C","RW","LD","RD"].indexOf(m[3]) : 9, (b.lastName||b.firstName)]; };
+  const roster = [...O.roster].sort((a,b)=>{ const ka=key(a), kb=key(b); for(let i=0;i<3;i++){ if(ka[i]!==kb[i]) return ka[i]-kb[i]; } return ka[3].localeCompare(kb[3]); });
+  const land = isLandscape(), total = land ? 4 : 2;
+  const chunks = land ? [roster.slice(0, Math.ceil(roster.length/2)), roster.slice(Math.ceil(roster.length/2))] : [roster];
+  const head = prefix => `<span>${prefix?prefix+" &nbsp;·&nbsp; ":""}${O.name.toUpperCase()}&nbsp;<em>at</em>&nbsp;ALABAMA &nbsp;·&nbsp; ${TEAM.game.date}${prefix?"":" &nbsp;·&nbsp; "+TEAM.game.time}</span><small>${O.note.toUpperCase()} · ${TEAM.game.label} · FILL IN NUMBERS AT THE RINK</small>`;
+  const foot = (n, label) => [`PAGE ${n} OF ${total} · ${label}`, `Source: ${O.source}`, `${roster.length} NAMES · NO NUMBERS OR STATS SUPPLIED`];
+  const pages = chunks.map((chunk,i)=> pageShell({cls:"call-sheet opp", id:"oppSheet"+(i?i+1:""), headLeft: O.name.toUpperCase(), headRight: head(""),
+    colA:"# (WRITE IN) / PLAYER", colB:"NOTES",
+    foot: foot(1+i, "BANDITS ROSTER" + (chunks.length>1 ? ` · ${(chunk[0].lastName||chunk[0].firstName).toUpperCase()}–${(chunk[chunk.length-1].lastName||chunk[chunk.length-1].firstName).toUpperCase()}` : "")),
+    body:`<div class="cs-rows">${chunk.map(banditRow).join("")}</div>`}));
+  const name = id => { const b = O.roster.find(x=>x.id===id); return b && (b.lastName ? `<b>${b.lastName.toUpperCase()}</b> ${b.firstName}` : `<b>${b.firstName.toUpperCase()}</b>`); };
+  const sec = (t, body) => `<div class="ts-sec"><h3>${t}</h3>${body}</div>`;
+  const fill = t => `<div class="ts-sec fill"><h3>${t}</h3><div class="rule"></div></div>`;
+  const col = (...parts) => `<div class="ts-col">${parts.join("")}</div>`;
+  const grid = linesGrid(O.lines, name, {blankRows:["PP1","PP2","PK1","PK2"]});
+  const goalies = `<div class="lines"><div class="line"><div class="lbl">START</div><div class="slot">${(O.lines.goalies[0] && name(O.lines.goalies[0])) || "&nbsp;"}</div><div class="slot">&nbsp;</div></div>
+    <div class="line"><div class="lbl">BACKUP</div><div class="slot">${(O.lines.goalies[1] && name(O.lines.goalies[1])) || "&nbsp;"}</div><div class="slot">&nbsp;</div></div></div>`;
+  const linesPage = n => pageShell({cls:"team-sheet opp", id:"oppTeam", headLeft: O.name.toUpperCase(), headRight: head("LINES"),
+    colA:"LINES · PP · PK · GOALIES", colB:"GAME NOTES · SCORING · PENALTIES", foot: foot(n, "BANDITS LINES"),
+    body:`<div class="ts-body">${col(sec(`LINES — from the Bandits lines app`, grid), sec("GOALIES", goalies), fill("GAME NOTES"))}${col(fill("GAME NOTES · SCORING · PENALTIES"))}</div>`});
+  const notesPage = n => pageShell({cls:"team-sheet opp", id:"oppNotes", headLeft: O.name.toUpperCase(), headRight: head("NOTES"),
+    colA:"GAME NOTES", colB:"SCORING · PENALTIES", foot: foot(n, "BANDITS NOTES"),
+    body:`<div class="ts-body">${col(fill("GAME NOTES"))}${col(fill("SCORING · PENALTIES"))}</div>`});
+  return pages.join("") + (land ? linesPage(3) + notesPage(4) : linesPage(2));
+}
+
 /* build every page for the current layout */
 function renderPages(){
   const total = isLandscape() ? 4 : 2;
   const callPages = isLandscape() ? 2 : 1;
   $('#pages').innerHTML = callSheetPages(1, total) + teamSheetPages(callPages+1, total);
+  if($('#oppPages')) $('#oppPages').innerHTML = banditsPages();
   document.body.classList.toggle('landscape', isLandscape());
   $('#btnLayout').textContent = isLandscape() ? "LAYOUT: 4 × LANDSCAPE" : "LAYOUT: 2 × PORTRAIT";
 }
@@ -358,7 +416,7 @@ $('#btnPreview').onclick = ()=>{
 $('#btnLayout').onclick = ()=>{
   LAYOUT.mode = isLandscape() ? 'portrait' : 'landscape';
   store.write('bamaLayout', LAYOUT.mode);
-  renderPages(); FIT.load(); showView('sheet');
+  renderPages(); FIT.load(); showView($('#view-bandits').classList.contains('active') ? 'bandits' : 'sheet');
   window.scrollTo({top:0, behavior:'smooth'});
 };
 window.addEventListener('resize', scaleSheet);

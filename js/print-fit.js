@@ -30,8 +30,8 @@ function setScale(s){
 /* worst overflow (px) anywhere on any call-sheet page */
 function measureOverflow(){
   let over = 0;
-  $$('.call-sheet').forEach(page=>{ over = Math.max(over, page.scrollHeight - page.clientHeight); });
-  $$('.call-sheet .player-row').forEach(row=>{
+  $$('.view.active .call-sheet').forEach(page=>{ over = Math.max(over, page.scrollHeight - page.clientHeight); });
+  $$('.view.active .call-sheet .player-row').forEach(row=>{
     row.querySelectorAll('.id-cell, .notes-cell').forEach(cell=>{
       over = Math.max(over, cell.scrollHeight - cell.clientHeight);
     });
@@ -57,7 +57,7 @@ function autoFit(){
 /* team-sheet pages have fixed text sizes; they can only overflow if content is added */
 function teamOverflow(){
   let over = 0;
-  $$('.team-sheet').forEach(ts=>{
+  $$('.view.active .team-sheet').forEach(ts=>{
     over = Math.max(over, ts.scrollHeight - ts.clientHeight);
     ts.querySelectorAll('.ts-col').forEach(c=>{ over = Math.max(over, c.scrollHeight - c.clientHeight); });
   });

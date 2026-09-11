@@ -11,6 +11,7 @@ Broadcast prep and live-call tool for Alabama Women's Hockey. Open `index.html` 
 | **Flashcards** | Number → name drills. `Space` reveals, `←`/`→` moves. |
 | **Quizzes** | Number → name, name → number. Photo ID unlocks once headshots exist. |
 | **Broadcast Mode** | Dark, searchable roster for emergency lookup during the call. |
+| **Bandits Sheet** | Printable opponent packet: names in line order with blank number boxes and ruled notes, then their lines grid with blank PP / PK / goalie write-ins. Follows the LAYOUT toggle; PRINT from this tab prints only this packet. |
 
 ## Printing
 
