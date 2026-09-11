@@ -331,7 +331,7 @@ const ROSTER = [
     {field:"height", keep:"5'2\"", alternate:null, alternateSource:"Elite Prospects", note:"Height 5'2\" comes from Elite Prospects; no official value on the team sheet.", print:false}
   ],
   notes:[
-    {text:"Goalie of record for 9 of the 15 games in the 2025 CHS championship season", category:"achievement", priority:1},
+    {text:"Goalie of record in 9 games of the 2025 CHS championship season", category:"achievement", priority:1},
     {text:"Transferred in from Maryville Univ. (ACHA D2) · Nursing major · 8 years of hockey", category:"hockey-history", priority:2},
     {text:"23 years old · one of three seniors with Scott and Bobruff", category:"connection", priority:3}
   ]},
